@@ -1,0 +1,109 @@
+<div class="tools-manager">
+    <v-card>
+        <v-card-title>Security Tools Manager</v-card-title>
+        <v-card-text>
+            <v-tabs v-model="activeTab">
+                <v-tab value="installed">Installed Tools</v-tab>
+                <v-tab value="available">Available Tools</v-tab>
+                <v-tab value="custom">Custom Tools</v-tab>
+            </v-tabs>
+
+            <v-window v-model="activeTab">
+                <!-- Installed Tools -->
+                <v-window-item value="installed">
+                    <v-list>
+                        <v-list-item v-for="tool in installedTools" :key="tool.name">
+                            <v-list-item-content>
+                                <v-list-item-title>${tool.name}</v-list-item-title>
+                                <v-list-item-subtitle>
+                                    <v-chip color="green" text-color="white">Installed</v-chip>
+                                    <v-chip>${tool.version}</v-chip>
+                                </v-list-item-subtitle>
+                            </v-list-item-content>
+                            <v-list-item-action>
+                                <v-btn @click="updateTool(tool)" color="primary" small>
+                                    Update
+                                </v-btn>
+                            </v-list-item-action>
+                        </v-list-item>
+                    </v-list>
+                </v-window-item>
+
+                <!-- Available Tools -->
+                <v-window-item value="available">
+                    <v-text-field
+                        v-model="searchTool"
+                        label="Search Tools"
+                        prepend-icon="mdi-magnify"
+                    ></v-text-field>
+
+                    <v-list>
+                        <v-list-group
+                            v-for="category in toolCategories"
+                            :key="category.name"
+                        >
+                            <template v-slot:activator="{ props }">
+                                <v-list-item v-bind="props">
+                                    <v-list-item-title>${category.name}</v-list-item-title>
+                                </v-list-item>
+                            </template>
+
+                            <v-list-item
+                                v-for="tool in filteredTools(category.tools)"
+                                :key="tool.name"
+                            >
+                                <v-list-item-content>
+                                    <v-list-item-title>${tool.name}</v-list-item-title>
+                                    <v-list-item-subtitle>${tool.description}</v-list-item-subtitle>
+                                </v-list-item-content>
+                                <v-list-item-action>
+                                    <v-btn
+                                        @click="installTool(tool)"
+                                        color="primary"
+                                        :loading="tool.installing"
+                                        small
+                                    >
+                                        Install
+                                    </v-btn>
+                                </v-list-item-action>
+                            </v-list-item>
+                        </v-list-group>
+                    </v-list>
+                </v-window-item>
+
+                <!-- Custom Tools -->
+                <v-window-item value="custom">
+                    <v-form @submit.prevent="addCustomTool">
+                        <v-text-field
+                            v-model="newTool.name"
+                            label="Tool Name"
+                            required
+                        ></v-text-field>
+                        <v-text-field
+                            v-model="newTool.command"
+                            label="Installation Command"
+                            required
+                        ></v-text-field>
+                        <v-text-field
+                            v-model="newTool.checkCommand"
+                            label="Version Check Command"
+                        ></v-text-field>
+                        <v-textarea
+                            v-model="newTool.description"
+                            label="Description"
+                        ></v-textarea>
+                        <v-select
+                            v-model="newTool.category"
+                            :items="toolCategories"
+                            item-title="name"
+                            label="Category"
+                        ></v-select>
+                        <v-btn type="submit" color="primary">
+                            Add Custom Tool
+                        </v-btn>
+                    </v-form>
+                </v-window-item>
+            </v-window>
+        </v-card-text>
+    </v-card>
+</div>

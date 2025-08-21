@@ -1,0 +1,139 @@
+<div class="report-generator">
+    <v-card>
+        <v-card-title>Report Generator</v-card-title>
+        <v-card-text>
+            <v-form @submit.prevent="generateReport">
+                <!-- Basic Information -->
+                <v-text-field
+                    v-model="report.title"
+                    label="Report Title"
+                    required
+                ></v-text-field>
+
+                <v-select
+                    v-model="report.template"
+                    :items="reportTemplates"
+                    item-title="name"
+                    label="Report Template"
+                    required
+                ></v-select>
+
+                <!-- Findings Section -->
+                <v-expansion-panels>
+                    <v-expansion-panel
+                        v-for="(finding, index) in report.findings"
+                        :key="index"
+                    >
+                        <v-expansion-panel-title>
+                            Finding #${index + 1}: ${finding.title || 'New Finding'}
+                        </v-expansion-panel-title>
+                        <v-expansion-panel-text>
+                            <v-text-field
+                                v-model="finding.title"
+                                label="Finding Title"
+                            ></v-text-field>
+                            
+                            <v-select
+                                v-model="finding.severity"
+                                :items="['Critical', 'High', 'Medium', 'Low', 'Info']"
+                                label="Severity"
+                            ></v-select>
+
+                            <v-text-field
+                                v-model="finding.cveId"
+                                label="CVE ID (if applicable)"
+                                @input="fetchCVEDetails(finding)"
+                            ></v-text-field>
+
+                            <v-textarea
+                                v-model="finding.description"
+                                label="Description"
+                            ></v-textarea>
+
+                            <v-textarea
+                                v-model="finding.technicalDetails"
+                                label="Technical Details"
+                            ></v-textarea>
+
+                            <v-textarea
+                                v-model="finding.remediation"
+                                label="Remediation Steps"
+                            ></v-textarea>
+
+                            <!-- Evidence Upload -->
+                            <v-file-input
+                                v-model="finding.evidence"
+                                label="Upload Evidence/Screenshots"
+                                multiple
+                                chips
+                                accept="image/*"
+                            ></v-file-input>
+
+                            <div v-if="finding.cveDetails" class="mt-4">
+                                <v-alert
+                                    type="info"
+                                    title="CVE Information"
+                                >
+                                    <p><strong>CVSS Score:</strong> ${finding.cveDetails.cvssScore}</p>
+                                    <p><strong>Published:</strong> ${finding.cveDetails.published}</p>
+                                    <p>${finding.cveDetails.description}</p>
+                                </v-alert>
+                            </div>
+
+                            <div v-if="finding.exploits && finding.exploits.length" class="mt-4">
+                                <v-alert
+                                    type="warning"
+                                    title="Available Exploits"
+                                >
+                                    <v-list>
+                                        <v-list-item
+                                            v-for="exploit in finding.exploits"
+                                            :key="exploit.id"
+                                        >
+                                            <v-list-item-title>${exploit.title}</v-list-item-title>
+                                            <v-list-item-subtitle>
+                                                <a :href="exploit.url" target="_blank">View Details</a>
+                                            </v-list-item-subtitle>
+                                        </v-list-item>
+                                    </v-list>
+                                </v-alert>
+                            </div>
+                        </v-expansion-panel-text>
+                    </v-expansion-panel>
+                </v-expansion-panels>
+
+                <v-btn
+                    color="primary"
+                    class="mt-4"
+                    @click="addFinding"
+                >
+                    Add Finding
+                </v-btn>
+
+                <!-- Executive Summary -->
+                <v-textarea
+                    v-model="report.executiveSummary"
+                    label="Executive Summary"
+                    class="mt-4"
+                ></v-textarea>
+
+                <!-- Report Format -->
+                <v-select
+                    v-model="report.format"
+                    :items="['PDF', 'DOCX', 'HTML']"
+                    label="Output Format"
+                ></v-select>
+
+                <v-btn
+                    type="submit"
+                    color="primary"
+                    block
+                    class="mt-4"
+                    :loading="generating"
+                >
+                    Generate Report
+                </v-btn>
+            </v-form>
+        </v-card-text>
+    </v-card>
+</div>

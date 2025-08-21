@@ -1,0 +1,165 @@
+/* General Styles */
+body {
+    background-color: #f5f5f5;
+}
+
+.v-application {
+    background: linear-gradient(135deg, #1a237e, #0d47a1);
+}
+
+/* Card Styles */
+.v-card {
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.v-card-title {
+    background-color: #1a237e;
+    color: white;
+    padding: 16px;
+    border-radius: 8px 8px 0 0;
+}
+
+/* Scenario Wizard */
+.scenario-wizard .v-stepper {
+    box-shadow: none;
+    background: transparent;
+}
+
+.scenario-wizard .v-stepper-content {
+    padding: 24px;
+    background: white;
+    border-radius: 4px;
+}
+
+/* Tools Manager */
+.tools-manager .v-list {
+    background: transparent;
+}
+
+.tools-manager .v-list-item {
+    margin-bottom: 8px;
+    background: white;
+    border-radius: 4px;
+}
+
+.tools-manager .v-chip {
+    margin-right: 8px;
+}
+
+/* Report Generator */
+.report-generator .v-expansion-panels {
+    background: transparent;
+}
+
+.report-generator .v-expansion-panel {
+    margin-bottom: 8px;
+    background: white;
+    border-radius: 4px !important;
+}
+
+.report-generator .v-alert {
+    margin-top: 16px;
+}
+
+/* Custom Scenario Creator */
+.custom-scenario-creator .v-list-item {
+    background: white;
+    margin-bottom: 8px;
+    border-radius: 4px;
+}
+
+/* Code Output */
+pre {
+    background: #1a1a1a;
+    color: #fff;
+    padding: 16px;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-family: 'Fira Code', monospace;
+}
+
+code {
+    font-family: 'Fira Code', monospace;
+    padding: 2px 4px;
+    background: #f5f5f5;
+    border-radius: 4px;
+}
+
+/* Buttons */
+.v-btn {
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.v-btn.v-btn--icon {
+    background: transparent;
+}
+
+/* Form Fields */
+.v-text-field.v-text-field--outlined .v-input__control {
+    min-height: 44px;
+}
+
+.v-text-field.v-text-field--outlined .v-input__slot {
+    min-height: 44px;
+}
+
+/* Animations */
+.v-expand-transition-enter-active,
+.v-expand-transition-leave-active {
+    transition: all 0.3s ease-out;
+}
+
+.v-expand-transition-enter-from,
+.v-expand-transition-leave-to {
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+/* Loading States */
+.v-progress-circular {
+    margin: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .v-card-title {
+        font-size: 1.25rem;
+    }
+
+    .v-btn {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    .v-list-item {
+        flex-direction: column;
+    }
+
+    .v-list-item__action {
+        margin-left: 0;
+        margin-top: 8px;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212;
+    }
+
+    .v-card {
+        background-color: #1e1e1e;
+    }
+
+    .v-text-field.v-text-field--outlined .v-input__slot {
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    code {
+        background: #2d2d2d;
+        color: #fff;
+    }
+}

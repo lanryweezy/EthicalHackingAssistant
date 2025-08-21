@@ -1,0 +1,86 @@
+# Ethical Hacking Assistant UI Configuration
+
+# Color scheme for different message types
+color_scheme:
+  normal:
+    fg: "white"
+    bg: null
+    style: null
+  error:
+    fg: "red"
+    bg: null
+    style: "bold"
+  warning:
+    fg: "yellow"
+    bg: null
+    style: null
+  success:
+    fg: "green"
+    bg: null
+    style: "bold"
+  info:
+    fg: "cyan"
+    bg: null
+    style: null
+  system:
+    fg: "magenta"
+    bg: null
+    style: null
+  agent:
+    fg: "blue"
+    bg: null
+    style: "bold"
+  ethical:
+    fg: "yellow"
+    bg: null
+    style: "bold"
+
+# General UI settings
+clear_on_start: true
+background: "dark"
+show_ethical_reminder: true
+log_level: "INFO"
+command_history_limit: 1000
+auto_log_commands: true
+
+# Ethical guidelines settings
+ethical_guidelines:
+  show_on_startup: true
+  reminder_interval: 3600  # Show a reminder every hour of usage
+  log_all_commands: true
+  require_acknowledgment: true
+
+# Safety settings
+safety:
+  confirm_dangerous_commands: true
+  dangerous_command_patterns:
+    - "rm -rf"
+    - "format"
+    - "mkfs"
+    - "dd if="
+    - "fdisk"
+    - ":(){ :|:& };:"  # Fork bomb
+    - "chmod -R 777 /"
+    - "chmod -R 000 /"
+    - "wget .* | bash"
+    - "curl .* | bash"
+    - "> /dev/sda"
+    - "> /dev/hda"
+  restricted_tools:
+    - name: "nmap"
+      warning: "Use responsibly. Aggressive scans may be detected and blocked."
+      require_confirmation: true
+    - name: "sqlmap"
+      warning: "Only use on systems you have permission to test."
+      require_confirmation: true
+    - name: "metasploit"
+      warning: "Exploitation tools must only be used with explicit authorization."
+      require_confirmation: true
+
+# Logging configuration
+logging:
+  log_dir: "logs"
+  log_format: "%(asctime)s [%(levelname)s] %(message)s"
+  rotate_logs: true
+  max_log_size_mb: 10
+  backup_count: 5

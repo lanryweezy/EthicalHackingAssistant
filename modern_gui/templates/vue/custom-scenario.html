@@ -1,0 +1,197 @@
+<div class="custom-scenario-creator">
+    <v-card>
+        <v-card-title>Custom Scenario Creator</v-card-title>
+        <v-card-text>
+            <v-form @submit.prevent="createScenario">
+                <!-- Basic Scenario Info -->
+                <v-text-field
+                    v-model="scenario.name"
+                    label="Scenario Name"
+                    required
+                ></v-text-field>
+
+                <v-textarea
+                    v-model="scenario.description"
+                    label="Description"
+                ></v-textarea>
+
+                <v-select
+                    v-model="scenario.category"
+                    :items="scenarioCategories"
+                    label="Category"
+                ></v-select>
+
+                <!-- Steps Configuration -->
+                <v-expansion-panels>
+                    <v-expansion-panel
+                        v-for="(step, index) in scenario.steps"
+                        :key="index"
+                    >
+                        <v-expansion-panel-title>
+                            Step #${index + 1}: ${step.name || 'New Step'}
+                        </v-expansion-panel-title>
+                        <v-expansion-panel-text>
+                            <v-text-field
+                                v-model="step.name"
+                                label="Step Name"
+                            ></v-text-field>
+
+                            <v-textarea
+                                v-model="step.description"
+                                label="Step Description"
+                            ></v-textarea>
+
+                            <!-- Tool Selection -->
+                            <v-select
+                                v-model="step.tools"
+                                :items="availableTools"
+                                label="Required Tools"
+                                multiple
+                                chips
+                            ></v-select>
+
+                            <!-- Commands Configuration -->
+                            <v-list>
+                                <v-list-subheader>Commands</v-list-subheader>
+                                <v-list-item
+                                    v-for="(cmd, cmdIndex) in step.commands"
+                                    :key="cmdIndex"
+                                >
+                                    <v-list-item-content>
+                                        <v-text-field
+                                            v-model="cmd.command"
+                                            label="Command"
+                                        ></v-text-field>
+                                        <v-text-field
+                                            v-model="cmd.description"
+                                            label="Command Description"
+                                        ></v-text-field>
+                                    </v-list-item-content>
+                                    <v-list-item-action>
+                                        <v-btn
+                                            icon
+                                            @click="removeCommand(step, cmdIndex)"
+                                        >
+                                            <v-icon>mdi-delete</v-icon>
+                                        </v-btn>
+                                    </v-list-item-action>
+                                </v-list-item>
+                            </v-list>
+
+                            <v-btn
+                                color="primary"
+                                @click="addCommand(step)"
+                                small
+                            >
+                                Add Command
+                            </v-btn>
+
+                            <!-- Variables -->
+                            <v-list class="mt-4">
+                                <v-list-subheader>Variables</v-list-subheader>
+                                <v-list-item
+                                    v-for="(variable, varIndex) in step.variables"
+                                    :key="varIndex"
+                                >
+                                    <v-list-item-content>
+                                        <v-text-field
+                                            v-model="variable.name"
+                                            label="Variable Name"
+                                        ></v-text-field>
+                                        <v-text-field
+                                            v-model="variable.description"
+                                            label="Variable Description"
+                                        ></v-text-field>
+                                        <v-select
+                                            v-model="variable.type"
+                                            :items="['string', 'number', 'boolean']"
+                                            label="Variable Type"
+                                        ></v-select>
+                                    </v-list-item-content>
+                                    <v-list-item-action>
+                                        <v-btn
+                                            icon
+                                            @click="removeVariable(step, varIndex)"
+                                        >
+                                            <v-icon>mdi-delete</v-icon>
+                                        </v-btn>
+                                    </v-list-item-action>
+                                </v-list-item>
+                            </v-list>
+
+                            <v-btn
+                                color="primary"
+                                @click="addVariable(step)"
+                                small
+                            >
+                                Add Variable
+                            </v-btn>
+
+                            <!-- Verification Checks -->
+                            <v-list class="mt-4">
+                                <v-list-subheader>Success Checks</v-list-subheader>
+                                <v-list-item
+                                    v-for="(check, checkIndex) in step.checks"
+                                    :key="checkIndex"
+                                >
+                                    <v-list-item-content>
+                                        <v-text-field
+                                            v-model="check.condition"
+                                            label="Check Condition"
+                                        ></v-text-field>
+                                        <v-text-field
+                                            v-model="check.message"
+                                            label="Success/Failure Message"
+                                        ></v-text-field>
+                                    </v-list-item-content>
+                                    <v-list-item-action>
+                                        <v-btn
+                                            icon
+                                            @click="removeCheck(step, checkIndex)"
+                                        >
+                                            <v-icon>mdi-delete</v-icon>
+                                        </v-btn>
+                                    </v-list-item-action>
+                                </v-list-item>
+                            </v-list>
+
+                            <v-btn
+                                color="primary"
+                                @click="addCheck(step)"
+                                small
+                            >
+                                Add Check
+                            </v-btn>
+
+                            <v-btn
+                                color="error"
+                                @click="removeStep(index)"
+                                class="mt-4"
+                            >
+                                Remove Step
+                            </v-btn>
+                        </v-expansion-panel-text>
+                    </v-expansion-panel>
+                </v-expansion-panels>
+
+                <v-btn
+                    color="primary"
+                    @click="addStep"
+                    class="mt-4"
+                >
+                    Add Step
+                </v-btn>
+
+                <v-btn
+                    type="submit"
+                    color="success"
+                    block
+                    class="mt-4"
+                    :loading="saving"
+                >
+                    Save Scenario
+                </v-btn>
+            </v-form>
+        </v-card-text>
+    </v-card>
+</div>

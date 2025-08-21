@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteHat - The Ultimate Cyberpunk Terminal for Ethical Hackers</title>
+    <meta name="description" content="WhiteHat is the revolutionary terminal designed exclusively for ethical hackers and penetration testers. Experience the future of cybersecurity with advanced command blocks, cross-platform compatibility, and professional-grade security tools.">
+    <link rel="stylesheet" href="styles-cyberpunk.css">
+</head>
+<body>
+    <!-- Matrix Rain Background -->
+    <div class="matrix-rain" id="matrix-canvas"></div>
+    
+    <!-- Dataflow Lines -->
+    <div class="dataflow-container">
+        <div class="dataflow-line"></div>
+        <div class="dataflow-line"></div>
+        <div class="dataflow-line"></div>
+        <div class="dataflow-line"></div>
+        <div class="dataflow-line"></div>
+        <div class="dataflow-line"></div>
+    </div>
+
+    <header>
+        <nav>
+            <div class="logo" data-text="WhiteHat">WhiteHat</div>
+            <ul class="nav-links">
+                <li><a href="#hero">HOME</a></li>
+                <li><a href="#story">STORY</a></li>
+                <li><a href="#features">FEATURES</a></li>
+                <li><a href="#pricing">PRICING</a></li>
+                <li><a href="#download">DOWNLOAD</a></li>
+            </ul>
+            <a href="#download" class="cta-button">JACK IN</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="glitch-text" data-text="WHITEHAT">WHITEHAT</h1>
+                <p class="hero-subtitle">The Ultimate Pen Test Terminal for Ethical Hackers</p>
+                <p class="hero-description">Finally, a terminal that understands your workflow. WhiteHat revolutionizes penetration testing with intelligent command blocks, real-time collaboration, and tools designed by hackers, for hackers.</p>
+                <div class="hero-buttons">
+                    <a href="#download" class="cta-button">INITIATE SEQUENCE</a>
+                    <a href="#story" class="secondary-button">DECRYPT STORY</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">10,000+</span>
+                        <span class="stat-label">Security Professionals</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">50+</span>
+                        <span class="stat-label">Integrated Tools</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">3</span>
+                        <span class="stat-label">Platforms Supported</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="terminal-mockup">
+                    <div class="terminal-header">
+                        <div class="terminal-controls">
+                            <span class="control close"></span>
+                            <span class="control minimize"></span>
+                            <span class="control maximize"></span>
+                        </div>
+                        <div class="terminal-title">WHITEHAT TERMINAL v1.0</div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="command-block">
+                            <div class="command-header">
+                                <span class="block-number">01</span>
+                                <span class="command-text">nmap -sV target.corp</span>
+                                <span class="status success">✓</span>
+                            </div>
+                            <div class="command-output">
+                                <div class="output-line">Starting Nmap 7.94...</div>
+                                <div class="output-line">Host is up (0.023s latency)</div>
+                                <div class="output-line highlight">22/tcp open ssh OpenSSH 8.9</div>
+                                <div class="output-line highlight">80/tcp open http Apache 2.4.41</div>
+                                <div class="output-line highlight">443/tcp open https OpenSSL 1.1.1</div>
+                            </div>
+                        </div>
+                        <div class="command-block">
+                            <div class="command-header">
+                                <span class="block-number">02</span>
+                                <span class="command-text">gobuster dir -u http://target.corp</span>
+                                <span class="status running">⟳</span>
+                            </div>
+                            <div class="command-output">
+                                <div class="output-line">Gobuster v3.6</div>
+                                <div class="output-line">Status: 200 | Size: 1024 | Found: /admin</div>
+                                <div class="typing-indicator"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Story Section -->
+    <section id="story" class="story">
+        <div class="container">
+            <h2 class="glitch-text" data-text="SYSTEM FAILURE">SYSTEM FAILURE</h2>
+            <div class="story-content">
+                <div class="story-text">
+                    <h3>The Terminal That Wasn't Built for You</h3>
+                    <p>It's 2 AM. The blue light of your screen illuminates your face as you stare at a maze of terminal windows. Command outputs blur together. You can't remember which scan found that critical vulnerability. The client report is due in 6 hours. Sound familiar?</p>
+                    
+                    <p>Traditional terminals were designed for a different era—before the complex, multi-layered workflows of modern penetration testing. Before the need to document every step for compliance and reporting. Before your reputation depended on finding what others missed.</p>
+                    
+                    <div class="pain-points">
+                        <div class="pain-point">
+                            <div class="pain-icon">😤</div>
+                            <div class="pain-text">
+                                <h4>Lost Command History</h4>
+                                <p>Can't remember what you ran 3 hours ago? Good luck scrolling through endless terminal history to find it.</p>
+                            </div>
+                        </div>
+                        <div class="pain-point">
+                            <div class="pain-icon">🔍</div>
+                            <div class="pain-text">
+                                <h4>Scattered Results</h4>
+                                <p>Nmap results in one window, Gobuster in another, notes in a third. Where did you put that critical SQL injection finding?</p>
+                            </div>
+                        </div>
+                        <div class="pain-point">
+                            <div class="pain-icon">📊</div>
+                            <div class="pain-text">
+                                <h4>Reporting Nightmare</h4>
+                                <p>Reconstructing your methodology for the client report means hours of additional work after the actual testing is complete.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="story-visual">
+                    <div class="chaos-terminal">
+                        <div class="chaos-header">LEGACY TERMINAL - CHAOS MODE</div>
+                        <div class="chaos-content">
+                            <div class="chaos-line">$ nmap -sV target.corp</div>
+                            <div class="chaos-line">$ gobuster dir -u http://target.corp</div>
+                            <div class="chaos-line">$ sqlmap -u "http://target.corp/login"</div>
+                            <div class="chaos-line">$ hydra -L users.txt -P pass.txt ssh://target.corp</div>
+                            <div class="chaos-line">$ nikto -h target.corp</div>
+                            <div class="chaos-line">$ dirb http://target.corp</div>
+                            <div class="chaos-line">$ whatweb target.corp</div>
+                            <div class="chaos-line">$ wpscan --url http://target.corp</div>
+                            <div class="chaos-overlay">
+                                <div class="chaos-message">
+                                    <div>❌ COMMAND OUTPUTS MIXED TOGETHER</div>
+                                    <div>❌ NO ORGANIZATION OR CONTEXT</div>
+                                    <div>❌ IMPOSSIBLE TO TRACK PROGRESS</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section class="solution">
+        <div class="container">
+            <h2 class="text-gradient">ENTER THE MATRIX: WHITEHAT</h2>
+            
+            <div class="solution-content">
+                <div class="solution-visual">
+                    <div class="organized-terminal hologram">
+                        <div class="hologram-content">
+                            <div class="organized-header">
+                                <div class="organized-title">WHITEHAT - ORGANIZED & POWERFUL</div>
+                                <div class="organized-controls">
+                                    <button class="control-btn">📊 GENERATE REPORT</button>
+                                    <button class="control-btn">💾 SAVE SESSION</button>
+                                </div>
+                            </div>
+                            <div class="organized-content">
+                                <div class="process-step">
+                                    <div class="step-header">
+                                        <span class="step-number">01</span>
+                                        <span class="step-title">RECONNAISSANCE</span>
+                                        <span class="step-status">✓ COMPLETE</span>
+                                    </div>
+                                    <div class="step-commands">
+                                        <div class="cmd-block">nmap -sV target.corp</div>
+                                        <div class="cmd-block">whois target.corp</div>
+                                    </div>
+                                </div>
+                                <div class="process-step">
+                                    <div class="step-header">
+                                        <span class="step-number">02</span>
+                                        <span class="step-title">ENUMERATION</span>
+                                        <span class="step-status">⟳ RUNNING</span>
+                                    </div>
+                                    <div class="step-commands">
+                                        <div class="cmd-block">gobuster dir -u http://target.corp</div>
+                                    </div>
+                                </div>
+                                <div class="success-overlay">
+                                    <div class="success-message">
+                                        <div>✅ AUTOMATICALLY ORGANIZED BY PHASE</div>
+                                        <div>✅ CLEAR PROGRESS TRACKING</div>
+                                        <div>✅ ONE-CLICK REPORTING</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hologram-flicker"></div>
+                    </div>
+                </div>
+                
+                <div class="solution-text">
+                    <h3>Built by Hackers, For Hackers</h3>
+                    <p>WhiteHat isn't just another terminal - it's a revolution in how ethical hackers work. Our team of cybersecurity professionals spent years perfecting the workflows that matter most to penetration testers.</p>
+                    
+                    <div class="solution-highlights">
+                        <div class="highlight">
+                            <div class="highlight-icon">🎯</div>
+                            <div class="highlight-text">
+                                <h4>Purpose-Built for Pen Testing</h4>
+                                <p>Every feature designed specifically for ethical hacking workflows</p>
+                            </div>
+                        </div>
+                        <div class="highlight">
+                            <div class="highlight-icon">🧠</div>
+                            <div class="highlight-text">
+                                <h4>Intelligent Command Organization</h4>
+                                <p>Visual blocks that group related commands and outputs automatically</p>
+                            </div>
+                        </div>
+                        <div class="highlight">
+                            <div class="highlight-icon">⚡</div>
+                            <div class="highlight-text">
+                                <h4>Instant Methodology Reconstruction</h4>
+                                <p>Generate professional reports with one click - no more manual documentation</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2>CYBERNETIC ENHANCEMENTS</h2>
+            <div class="features-grid">
+                <div class="feature-card animate-in animate-delay-100">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Command Blocks & Segments</h3>
+                    <p>Visually group and track commands with their outputs. Like Warp's blocks but designed specifically for penetration testing workflows. See command sequences, track progress, and identify patterns instantly.</p>
+                    <div class="feature-demo">
+                        <div class="demo-block">
+                            <div class="demo-header">Block 1: Port Scan</div>
+                            <div class="demo-content">nmap -sV target.corp → 22,80,443 open</div>
+                        </div>
+                        <div class="demo-block">
+                            <div class="demo-header">Block 2: Web Enum</div>
+                            <div class="demo-content">gobuster → /admin, /login found</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card animate-in animate-delay-200">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Real-Time Alerts & Notifications</h3>
+                    <p>Get instant notifications when scans complete, vulnerabilities are found, or tools require attention. Customizable alerts keep you informed without interrupting your flow.</p>
+                    <div class="feature-demo">
+                        <div class="alert-demo">
+                            <div class="alert success">✅ Nmap scan completed - 3 open ports found</div>
+                            <div class="alert warning">⚠️ Potential SQL injection detected</div>
+                            <div class="alert info">ℹ️ Gobuster found 15 directories</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card animate-in animate-delay-300">
+                    <div class="feature-icon">📊</div>
+                    <h3>Automatic Session Management</h3>
+                    <p>Every command, output, and discovery is automatically saved and organized. Resume sessions across reboots, share findings with team members, and never lose critical information again.</p>
+                    <div class="feature-demo">
+                        <div class="session-list">
+                            <div class="session-item">
+                                <div class="session-name">Company XYZ - External Pentest</div>
+                                <div class="session-date">Started: 2024-01-15, 127 commands</div>
+                            </div>
+                            <div class="session-item">
+                                <div class="session-name">Internal Network Assessment</div>
+                                <div class="session-date">Started: 2024-01-14, 89 commands</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card animate-in animate-delay-100">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Advanced Security Tools Integration</h3>
+                    <p>50+ pre-integrated tools including Nmap, Metasploit, Burp Suite, SQLMap, and more. Smart suggestions based on your current context and methodology phase.</p>
+                    <div class="feature-demo">
+                        <div class="tools-grid">
+                            <div class="tool-item">Nmap</div>
+                            <div class="tool-item">Metasploit</div>
+                            <div class="tool-item">Burp Suite</div>
+                            <div class="tool-item">SQLMap</div>
+                            <div class="tool-item">Gobuster</div>
+                            <div class="tool-item">Hydra</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card animate-in animate-delay-200">
+                    <div class="feature-icon">🚀</div>
+                    <h3>Cross-Platform Excellence</h3>
+                    <p>Native performance on Windows, macOS, and Linux. Consistent interface and features across all platforms. Cloud sync keeps your sessions accessible everywhere.</p>
+                    <div class="feature-demo">
+                        <div class="platform-icons">
+                            <div class="platform-icon">🪟</div>
+                            <div class="platform-icon">🍎</div>
+                            <div class="platform-icon">🐧</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card animate-in animate-delay-300">
+                    <div class="feature-icon">📝</div>
+                    <h3>One-Click Professional Reports</h3>
+                    <p>Generate comprehensive penetration testing reports instantly. Include methodology, findings, evidence, and recommendations. Export to PDF, Word, or HTML formats.</p>
+                    <div class="feature-demo">
+                        <div class="report-preview">
+                            <div class="report-header">Penetration Test Report</div>
+                            <div class="report-sections">
+                                <div class="report-section">Executive Summary</div>
+                                <div class="report-section">Methodology</div>
+                                <div class="report-section">Findings</div>
+                                <div class="report-section">Recommendations</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <div class="container">
+            <h2>NEURAL NETWORK FEEDBACK</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial-card animate-in">
+                    <div class="testimonial-content">
+                        <p>"WhiteHat has completely transformed how I approach penetration testing. The command blocks make it so easy to track my methodology and the automatic reporting saves me hours on every engagement."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">👨‍💻</div>
+                        <div class="author-info">
+                            <div class="author-name">Marcus Chen</div>
+                            <div class="author-title">Senior Penetration Tester, CyberDefense Corp</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card animate-in">
+                    <div class="testimonial-content">
+                        <p>"Finally, a terminal that understands the hacker mindset. WhiteHat's session management and real-time alerts have made our red team operations incredibly efficient."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">👩‍💻</div>
+                        <div class="author-info">
+                            <div class="author-name">Sarah Rodriguez</div>
+                            <div class="author-title">Red Team Lead, SecureNet Solutions</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card animate-in">
+                    <div class="testimonial-content">
+                        <p>"The cross-platform compatibility is game-changing. I can start a pentest on my Linux workstation and continue seamlessly on my MacBook when I'm on the move. WhiteHat just works."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">👨‍💻</div>
+                        <div class="author-info">
+                            <div class="author-name">Alex Thompson</div>
+                            <div class="author-title">Independent Security Consultant</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing">
+        <div class="container">
+            <h2>ACCESS LEVELS</h2>
+            <p class="pricing-subtitle">Select your clearance level. Upgrade anytime as your mission parameters expand.</p>
+            
+            <div class="pricing-grid">
+                <div class="pricing-card animate-in">
+                    <div class="plan-badge">LEVEL 1</div>
+                    <div class="plan-name">FREE</div>
+                    <div class="plan-price">$0<span>/month</span></div>
+                    <div class="plan-description">Perfect for students and hobbyists getting started with ethical hacking</div>
+                    <ul class="plan-features">
+                        <li>Basic terminal interface</li>
+                        <li>5 command blocks per session</li>
+                        <li>Essential security tools (Nmap, Gobuster, Nikto)</li>
+                        <li class="limited">Limited session history (7 days)</li>
+                        <li class="limited">Basic UI customization</li>
+                        <li class="unavailable">Advanced reporting</li>
+                        <li class="unavailable">Cloud sync</li>
+                        <li class="unavailable">Team collaboration</li>
+                    </ul>
+                    <a href="#download" class="cta-button">INITIALIZE</a>
+                </div>
+
+                <div class="pricing-card popular animate-in">
+                    <div class="plan-badge">LEVEL 2</div>
+                    <div class="plan-name">PRO</div>
+                    <div class="plan-price">$10<span>/month</span></div>
+                    <div class="plan-description">For professional penetration testers who demand the best</div>
+                    <ul class="plan-features">
+                        <li>Advanced terminal interface with themes</li>
+                        <li>Unlimited command blocks</li>
+                        <li>Full security toolkit (50+ tools)</li>
+                        <li>30-day session history</li>
+                        <li>Advanced UI customization</li>
+                        <li>Professional report generation</li>
+                        <li>Cloud sync across devices</li>
+                        <li>API access for integrations</li>
+                        <li class="limited">Email support</li>
+                        <li class="unavailable">Team collaboration</li>
+                        <li class="unavailable">Custom branding</li>
+                    </ul>
+                    <a href="#download" class="cta-button">UPGRADE</a>
+                </div>
+
+                <div class="pricing-card animate-in">
+                    <div class="plan-badge">LEVEL 3</div>
+                    <div class="plan-name">ENTERPRISE</div>
+                    <div class="plan-price">$40<span>/month</span></div>
+                    <div class="plan-description">For teams and organizations requiring advanced collaboration</div>
+                    <ul class="plan-features">
+                        <li>Everything in Pro, plus:</li>
+                        <li>Unlimited session history</li>
+                        <li>Advanced analytics dashboard</li>
+                        <li>Team collaboration features</li>
+                        <li>Shared session libraries</li>
+                        <li>Custom branding</li>
+                        <li>SSO integration</li>
+                        <li>Priority support</li>
+                        <li>Custom integrations</li>
+                        <li>Compliance reporting</li>
+                    </ul>
+                    <a href="#download" class="cta-button">ACTIVATE</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="download">
+        <div class="container">
+            <h2>DOWNLOAD PROTOCOL</h2>
+            <p class="download-subtitle">Select your system architecture and initialize the transfer sequence</p>
+            
+            <div class="download-grid">
+                <div class="download-card animate-in">
+                    <div class="download-icon">🪟</div>
+                    <h3>WINDOWS</h3>
+                    <p>Windows 10/11 (64-bit)</p>
+                    <div class="download-options">
+                        <a href="#" class="download-btn primary">DOWNLOAD .EXE</a>
+                        <a href="#" class="download-btn secondary">DOWNLOAD .MSI</a>
+                    </div>
+                    <div class="download-info">
+                        <div class="version">v1.0.0</div>
+                        <div class="size">45.2 MB</div>
+                    </div>
+                </div>
+
+                <div class="download-card animate-in">
+                    <div class="download-icon">🍎</div>
+                    <h3>MACOS</h3>
+                    <p>macOS 10.15+ (Intel & Apple Silicon)</p>
+                    <div class="download-options">
+                        <a href="#" class="download-btn primary">DOWNLOAD .DMG</a>
+                        <a href="#" class="download-btn secondary">APP STORE</a>
+                    </div>
+                    <div class="download-info">
+                        <div class="version">v1.0.0</div>
+                        <div class="size">42.8 MB</div>
+                    </div>
+                </div>
+
+                <div class="download-card animate-in">
+                    <div class="download-icon">🐧</div>
+                    <h3>LINUX</h3>
+                    <p>Ubuntu 20.04+ / Debian 11+ / CentOS 8+</p>
+                    <div class="download-options">
+                        <a href="#" class="download-btn primary">DOWNLOAD .DEB</a>
+                        <a href="#" class="download-btn secondary">DOWNLOAD .RPM</a>
+                    </div>
+                    <div class="download-info">
+                        <div class="version">v1.0.0</div>
+                        <div class="size">38.5 MB</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>WHITEHAT</h3>
+                    <p>The ultimate terminal for ethical hackers. Built by security professionals, for security professionals.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">🐦</a>
+                        <a href="#" class="social-link">🐙</a>
+                        <a href="#" class="social-link">💬</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>NAVIGATE</h3>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="#download">Download</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">API</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>SUPPORT</h3>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="#">Bug Reports</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>LEGAL</h3>
+                    <ul>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Terms</a></li>
+                        <li><a href="#">Security</a></li>
+                        <li><a href="#">License</a></li>
+                        <li><a href="#">EULA</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 WhiteHat. All rights reserved. Built for ethical hackers, by ethical hackers.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Matrix Rain Effect
+        function setupMatrixRain() {
+            const canvas = document.getElementById('matrix-canvas');
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$>_アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン';
+            const matrixDrops = [];
+            const fontSize = 16;
+            let width, height, columns;
+            
+            function createRainDrops() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                
+                // Clear existing drops
+                while (canvas.firstChild) {
+                    canvas.removeChild(canvas.firstChild);
+                }
+                
+                columns = Math.floor(width / fontSize);
+                
+                // Initialize drops at random positions
+                for (let i = 0; i < columns; i++) {
+                    const drop = document.createElement('div');
+                    drop.className = 'matrix-drop';
+                    drop.style.left = (i * fontSize) + 'px';
+                    drop.style.top = (Math.random() * -1000) + 'px';
+                    drop.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                    drop.textContent = characters.charAt(Math.floor(Math.random() * characters.length));
+                    
+                    canvas.appendChild(drop);
+                    matrixDrops.push({
+                        element: drop,
+                        y: parseInt(drop.style.top),
+                        speed: Math.random() * 2 + 1,
+                        char: drop.textContent
+                    });
+                }
+            }
+            
+            function draw() {
+                for (let i = 0; i < matrixDrops.length; i++) {
+                    const drop = matrixDrops[i];
+                    
+                    drop.y += drop.speed;
+                    drop.element.style.top = drop.y + 'px';
+                    
+                    // Change character randomly
+                    if (Math.random() > 0.98) {
+                        drop.char = characters.charAt(Math.floor(Math.random() * characters.length));
+                        drop.element.textContent = drop.char;
+                    }
+                    
+                    // Reset drop when it goes off screen
+                    if (drop.y > height) {
+                        drop.y = -fontSize;
+                        drop.element.style.top = drop.y + 'px';
+                        drop.char = characters.charAt(Math.floor(Math.random() * characters.length));
+                        drop.element.textContent = drop.char;
+                    }
+                }
+                
+                requestAnimationFrame(draw);
+            }
+            
+            // Initial setup
+            createRainDrops();
+            
+            // Handle window resize
+            window.addEventListener('resize', createRainDrops);
+            
+            // Start animation
+            draw();
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Header scroll effect
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Terminal command simulation
+        const simulateTerminalActivity = () => {
+            const runningStatus = document.querySelector('.status.running');
+            if (runningStatus) {
+                setTimeout(() => {
+                    runningStatus.textContent = '✓';
+                    runningStatus.className = 'status success';
+                    
+                    // Add a new output line
+                    const outputContainer = runningStatus.closest('.command-block').querySelector('.command-output');
+                    const newLine = document.createElement('div');
+                    newLine.className = 'output-line highlight';
+                    newLine.textContent = 'Status: 200 | Size: 2048 | Found: /login';
+                    outputContainer.appendChild(newLine);
+                    
+                    // Remove typing indicator
+                    const typingIndicator = outputContainer.querySelector('.typing-indicator');
+                    if (typingIndicator) {
+                        typingIndicator.remove();
+                    }
+                }, 3000);
+            }
+        };
+
+        // Glitch effect for text
+        function setupGlitchEffect() {
+            const glitchTexts = document.querySelectorAll('.glitch-text');
+            
+            glitchTexts.forEach(text => {
+                // Ensure data-text attribute is set
+                if (!text.getAttribute('data-text')) {
+                    text.setAttribute('data-text', text.textContent);
+                }
+                
+                // Random glitch intervals
+                setInterval(() => {
+                    text.style.animation = 'none';
+                    void text.offsetWidth; // Trigger reflow
+                    text.style.animation = 'glitch 3s infinite';
+                }, Math.random() * 10000 + 5000);
+            });
+        }
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for animations
+        document.querySelectorAll('.feature-card, .testimonial-card, .pricing-card, .download-card, .pain-point, .highlight').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setupMatrixRain();
+            setupGlitchEffect();
+            simulateTerminalActivity();
+            
+            // Add loading animation
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.8s ease';
+                document.body.style.opacity = '1';
+            }, 200);
+        });
+
+        // Add click effects to buttons
+        document.querySelectorAll('.cta-button, .secondary-button, .download-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    background: rgba(255, 255, 255, 0.3);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s ease-out;
+                    pointer-events: none;
+                `;
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // Add CSS for ripple effect
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

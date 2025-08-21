@@ -1,0 +1,111 @@
+<div class="scenario-wizard">
+    <v-card>
+        <v-card-title>Penetration Testing Scenarios</v-card-title>
+        <v-card-text>
+            <v-stepper v-model="currentStep">
+                <!-- Scenario Selection -->
+                <v-stepper-item step="1">
+                    <v-card-text>
+                        <v-select
+                            v-model="selectedScenario"
+                            :items="scenarios"
+                            item-title="name"
+                            label="Select Scenario"
+                            return-object
+                        ></v-select>
+                    </v-card-text>
+                </v-stepper-item>
+
+                <!-- Target Configuration -->
+                <v-stepper-item step="2">
+                    <v-card-text>
+                        <v-text-field
+                            v-model="target"
+                            label="Target (IP/Domain)"
+                            :rules="[v => !!v || 'Target is required']"
+                        ></v-text-field>
+                        <v-textarea
+                            v-model="scope"
+                            label="Scope and Rules of Engagement"
+                        ></v-textarea>
+                    </v-card-text>
+                </v-stepper-item>
+
+                <!-- Tool Verification -->
+                <v-stepper-item step="3">
+                    <v-card-text>
+                        <v-list>
+                            <v-list-item v-for="tool in requiredTools" :key="tool">
+                                <v-list-item-content>
+                                    <v-list-item-title>${tool}</v-list-item-title>
+                                    <v-list-item-subtitle>
+                                        <v-chip
+                                            :color="toolStatus[tool] ? 'green' : 'red'"
+                                            text-color="white"
+                                        >
+                                            ${toolStatus[tool] ? 'Installed' : 'Not Installed'}
+                                        </v-chip>
+                                        <v-btn
+                                            v-if="!toolStatus[tool]"
+                                            @click="installTool(tool)"
+                                            color="primary"
+                                            small
+                                        >
+                                            Install
+                                        </v-btn>
+                                    </v-list-item-subtitle>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+                    </v-card-text>
+                </v-stepper-item>
+
+                <!-- Execution -->
+                <v-stepper-item step="4">
+                    <v-card-text>
+                        <v-list>
+                            <v-list-item v-for="(step, index) in currentSteps" :key="index">
+                                <v-list-item-content>
+                                    <v-list-item-title>${step.name}</v-list-item-title>
+                                    <v-list-item-subtitle>
+                                        <code>${step.command}</code>
+                                        <v-btn
+                                            @click="executeStep(step)"
+                                            color="primary"
+                                            small
+                                            :loading="step.running"
+                                        >
+                                            Execute
+                                        </v-btn>
+                                    </v-list-item-subtitle>
+                                    <v-expand-transition>
+                                        <div v-if="step.output">
+                                            <pre>${step.output}</pre>
+                                        </div>
+                                    </v-expand-transition>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+                    </v-card-text>
+                </v-stepper-item>
+            </v-stepper>
+        </v-card-text>
+        
+        <v-card-actions>
+            <v-btn
+                @click="previousStep"
+                :disabled="currentStep === 1"
+            >
+                Previous
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn
+                @click="nextStep"
+                color="primary"
+                :disabled="!canProceed"
+            >
+                ${currentStep === 4 ? 'Finish' : 'Next'}
+            </v-btn>
+        </v-card-actions>
+    </v-card>
+</div>

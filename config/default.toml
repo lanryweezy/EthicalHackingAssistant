@@ -1,0 +1,16 @@
+[app]
+name = "Ethical Hacking Assistant"
+version = "1.0.0"
+debug = false
+
+[ui]
+theme = "dark"
+language = "en"
+
+[security]
+enable_command_validation = true
+max_risk_level = 3
+
+[logging]
+level = "INFO"
+file = "app.log"

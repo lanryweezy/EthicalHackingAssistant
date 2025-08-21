@@ -1,0 +1,17 @@
+2025-07-16 14:59:52,525 [INFO] Ethical Hacking Assistant CLI started
+2025-07-16 15:00:09,800 [INFO] Welcome screen and ethical disclaimer displayed
+2025-07-16 15:03:44,677 [INFO] Command executed: /help 
+2025-07-16 15:05:04,277 [INFO] Command executed: [agent] mode
+2025-07-16 15:05:04,384 [ERROR] Failed to parse LLM response: Expecting value: line 1 column 1 (char 0)
+2025-07-16 15:07:11,325 [ERROR] CLI error: list index out of range
+Traceback (most recent call last):
+  File "C:\Users\user\EthicalHackingAssistant\src\ui\cli_ui.py", line 492, in run
+    cmd_type, cmd_args, should_continue = self.parse_command(user_input)
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\EthicalHackingAssistant\src\ui\cli_ui.py", line 392, in parse_command
+    command = parts[0].lower()
+              ~~~~~^^^
+IndexError: list index out of range
+2025-07-16 15:07:37,978 [INFO] Command executed: [agent] mode terminal
+2025-07-16 15:07:37,980 [ERROR] Failed to parse LLM response: Expecting value: line 1 column 1 (char 0)
+2025-07-16 15:08:08,210 [INFO] CLI session ended

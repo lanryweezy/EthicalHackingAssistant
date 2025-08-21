@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Ethical Hacking Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        :root {
+            --sidebar-bg: #121212;
+            --main-bg: #1a1a1a;
+            --accent-color: #0099ff;
+            --text-color: #e0e0e0;
+            --border-color: #333333;
+            --toggle-bg-off: #444444;
+            --toggle-bg-on: var(--accent-color);
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            color: var(--text-color);
+            background-color: var(--main-bg);
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 220px;
+            background-color: var(--sidebar-bg);
+            padding: 20px 0;
+            height: 100vh;
+            overflow-y: auto;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .sidebar-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar-item:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .sidebar-item.active {
+            background-color: rgba(0, 153, 255, 0.2);
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .settings-header {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-section {
+            margin-bottom: 40px;
+        }
+
+        .settings-section h2 {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .settings-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .settings-option-info {
+            max-width: 70%;
+        }
+
+        .settings-option-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .settings-option-description {
+            font-size: 14px;
+            color: #aaaaaa;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--toggle-bg-off);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--toggle-bg-on);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        .input-field {
+            background-color: #2a2a2a;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 8px 12px;
+            width: 100%;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        .manage-button {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2a2a2a;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 10px 15px;
+            width: 100%;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .manage-button:hover {
+            background-color: #333333;
+        }
+
+        .dropdown-select {
+            background-color: #2a2a2a;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 8px 12px;
+            width: 250px;
+            color: var(--text-color);
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23aaaaaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 15px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        .tool-icon {
+            font-size: 18px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-item"><a href="/" style="text-decoration: none; color: inherit;">Home</a></div>
+        <div class="sidebar-item">Search</div>
+        <div class="sidebar-item">Account</div>
+        <div class="sidebar-item active">AI</div>
+        <div class="sidebar-item">Billing and usage</div>
+        <div class="sidebar-item">Code</div>
+        <div class="sidebar-item">Teams</div>
+        <div class="sidebar-item">Appearance</div>
+        <div class="sidebar-item">Features</div>
+        <div class="sidebar-item">Keyboard shortcuts</div>
+        <div class="sidebar-item">Pentesting Tools</div>
+        <div class="sidebar-item">Network Analysis</div>
+        <div class="sidebar-item">Shared blocks</div>
+        <div class="sidebar-item">Privacy</div>
+        <div class="sidebar-item">About</div>
+    </div>
+
+    <div class="main-content">
+        <div class="settings-header">AI</div>
+
+        <div class="settings-section">
+            <div class="settings-option">
+                <div class="settings-option-info">
+                    <div class="settings-option-title">Active AI</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="settings-option">
+                <div class="settings-option-info">
+                    <div class="settings-option-title">Next Command</div>
+                    <div class="settings-option-description">Let AI suggest the next command to run based on your command history, outputs, and common workflows.</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="settings-option">
+                <div class="settings-option-info">
+                    <div class="settings-option-title">Prompt Suggestions</div>
+                    <div class="settings-option-description">Let AI suggest natural language prompts, as inline banners, based on recent commands and their outputs.</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="settings-option">
+                <div class="settings-option-info">
+                    <div class="settings-option-title">Shared Block Title Generation</div>
+                    <div class="settings-option-description">Let AI generate a title for your shared block based on the command and output.</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>Agents</h2>
+            <div class="settings-option-description" style="margin-bottom: 20px;">
+                Set the boundaries for how your Agent operates. Choose what it can access, how much autonomy it has, and when it must ask for your approval. You can also fine-tune behavior around natural language input, codebase awareness, and more.
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>Models</h2>
+            <div class="settings-option">
+                <div class="settings-option-info">
+                    <div class="settings-option-title">Base model</div>
+                    <div class="settings-option-description">This model serves as the core engine for your terminal. It drives most interactions and invokes other models as necessary.</div>
+                </div>
+                <select class="dropdown-select">
+                    <option>claude 3.7 sonnet</option>
+                    <option>GPT-4o</option>
+                    <option>Gemini Pro</option>
+                    <option>Llama 3.1</option>
+                </select>
+            </div>
+
+            <div class="checkbox-container">
+                <input type="checkbox" id="model-picker" checked>
+                <label for="model-picker">Show model picker in prompt</label>
+            </div>
+
+            <div class="settings-option" style="margin-top: 20px;">
+                <div class="settings-option-info">
+                    <div class="settings-option-title">Planning model</div>
+                    <div class="settings-option-description">The planning model is responsible for breaking down complex tasks into actionable steps. It creates structured execution plans and decides how to route work between models.</div>
+                </div>
+                <select class="dropdown-select">
+                    <option>o3</option>
+                    <option>GPT-4o</option>
+                    <option>Gemini Pro</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>Permissions</h2>
+            
+            <div class="settings-option">
+                <div class="settings-option-info">
+                    <div class="settings-option-title"><span class="tool-icon">&#60;/&#62;</span>Apply code diffs</div>
+                </div>
+                <select class="dropdown-select">
+                    <option>Agent decides</option>
+                    <option>Always ask</option>
+                    <option>Always allow</option>
+                    <option>Never allow</option>
+                </select>
+            </div>
+            <div class="settings-option-description" style="margin-left: 28px; margin-top: -10px; margin-bottom: 20px;">
+                The Agent chooses the safest path: acting on its own when confident, and asking for approval when uncertain.
+            </div>
+
+            <div class="settings-option">
+                <div class="settings-option-info">
+                    <div class="settings-option-title"><span class="tool-icon">📄</span>Read files</div>
+                </div>
+                <select class="dropdown-select">
+                    <option>Agent decides</option>
+                    <option>Always ask</option>
+                    <option>Always allow</option>
+                    <option>Never allow</option>
+                </select>
+            </div>
+            <div class="settings-option-description" style="margin-left: 28px; margin-top: -10px; margin-bottom: 20px;">
+                The Agent chooses the safest path: acting on its own when confident, and asking for approval when uncertain.
+            </div>
+
+            <div class="settings-option">
+                <div class="settings-option-info">
+                    <div class="settings-option-title"><span class="tool-icon">📋</span>Create plans</div>
+                </div>
+                <select class="dropdown-select">
+                    <option>Agent decides</option>
+                    <option>Always ask</option>
+                    <option>Always allow</option>
+                    <option>Never allow</option>
+                </select>
+            </div>
+            <div class="settings-option-description" style="margin-left: 28px; margin-top: -10px; margin-bottom: 20px;">
+                The Agent chooses the safest path: acting on its own when confident, and asking for approval when uncertain.
+            </div>
+
+            <div class="settings-option">
+                <div class="settings-option-info">
+                    <div class="settings-option-title"><span class="tool-icon">⌨️</span>Execute commands</div>
+                </div>
+                <select class="dropdown-select">
+                    <option>Agent decides</option>
+                    <option>Always ask</option>
+                    <option>Always allow</option>
+                    <option>Never allow</option>
+                </select>
+            </div>
+            <div class="settings-option-description" style="margin-left: 28px; margin-top: -10px; margin-bottom: 20px;">
+                The Agent chooses the safest path: acting on its own when confident, and asking for approval when uncertain.
+            </div>
+
+            <div class="settings-option">
+                <div class="settings-option-info">
+                    <div class="settings-option-title">Command allowlist</div>
+                    <div class="settings-option-description">Regular expressions to match commands that can be automatically executed by Agent Mode.</div>
+                </div>
+            </div>
+            <input type="text" class="input-field" placeholder="e.g. ls .*" value="e.g. ls .*">
+
+            <div class="settings-option" style="margin-top: 20px;">
+                <div class="settings-option-info">
+                    <div class="settings-option-title">Command denylist</div>
+                    <div class="settings-option-description">Regular expressions to match commands that Agent Mode should always ask permission to execute.</div>
+                </div>
+            </div>
+            <input type="text" class="input-field" placeholder="e.g. rm .*" value="e.g. rm .*">
+        </div>
+
+        <div class="settings-section">
+            <h2>Input</h2>
+            
+            <div class="settings-option">
+                <div class="settings-option-info">
+                    <div class="settings-option-title">Natural language detection</div>
+                    <div class="settings-option-description">Enabling natural language detection will detect when natural language is written in the terminal input, and then automatically switch to Agent Mode for AI queries. Encountered an incorrect input detection? Let us know</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="settings-option">
+                <div class="settings-option-info">
+                    <div class="settings-option-title">Natural language denylist</div>
+                    <div class="settings-option-description">Commands listed here will never trigger natural language detection.</div>
+                </div>
+            </div>
+            <input type="text" class="input-field" placeholder="Commands, comma separated">
+
+            <div class="settings-option" style="margin-top: 20px;">
+                <div class="settings-option-info">
+                    <div class="settings-option-title">Show input hint text</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>Ethical Hacking Servers</h2>
+            <div class="settings-option-description" style="margin-bottom: 20px;">
+                Ethical Hacking servers expose security tools and data sources to the Agent through a standardized interface, essentially acting like plugins for your assistant. This allows you to extend the Agent's capabilities in a modular, flexible way.
+            </div>
+
+            <button class="manage-button">
+                <span>Manage Ethical Hacking servers</span>
+                <span>›</span>
+            </button>
+        </div>
+
+        <div class="settings-section">
+            <h2>Knowledge</h2>
+            
+            <div class="settings-option">
+                <div class="settings-option-info">
+                    <div class="settings-option-title">Rules</div>
+                    <div class="settings-option-description">Rules help the Agent follow project conventions, whether for codebases or specific workflows.</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <button class="manage-button">
+                <span>Manage rules</span>
+                <span>›</span>
+            </button>
+
+            <div class="settings-option" style="margin-top: 20px;">
+                <div class="settings-option-info">
+                    <div class="settings-option-title">Ethical Hacking Tools As Agent Mode Context</div>
+                    <div class="settings-option-description">Agent Mode can leverage your Ethical Hacking Tools Contents to tailor responses to your personal and team security workflows and environments. This includes any Scanning Tools, Exploitation Frameworks, and Environment Variables.</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>Voice</h2>
+            
+            <div class="settings-option">
+                <div class="settings-option-info">
+                    <div class="settings-option-title">Voice Input</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include settings JavaScript file -->
+    <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethical Hacking Assistant - Advanced Terminal</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <link rel="stylesheet" href="/static/css/terminal.css">
+    <link rel="stylesheet" href="/static/css/animations.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Cyberpunk Background Animation -->
+        <div class="cyber-grid"></div>
+        <div class="scanlines"></div>
+        
+        <!-- Main Terminal Container -->
+        <div class="terminal-container">
+            <!-- Tab Navigation -->
+            <div class="tab-navigation" id="tab-navigation">
+                <button class="new-tab">+</button>
+            </div>
+            <!-- Header Bar -->
+            <div class="terminal-header">
+                <div class="header-left">
+                    <div class="logo">
+                        <span class="logo-icon">⚡</span>
+                        <span class="logo-text">ETHICAL<span class="accent">HACK</span></span>
+                    </div>
+                    <div class="mode-selector">
+                        <button class="mode-btn active" data-mode="agent">
+                            <span class="mode-icon">🤖</span> Agent
+                        </button>
+                        <button class="mode-btn" data-mode="terminal">
+                            <span class="mode-icon">💻</span> Terminal
+                        </button>
+                        <button class="mode-btn" data-mode="scan">
+                            <span class="mode-icon">🔍</span> Scan
+                        </button>
+                        <button class="mode-btn" data-mode="exploit">
+                            <span class="mode-icon">🚀</span> Exploit
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="header-right">
+                    <div class="ai-model-selector">
+                        <span class="ai-model-label">AI Model:</span>
+                        <div class="ai-model-dropdown" id="ai-model-dropdown">
+                            <button class="ai-model-current" id="ai-model-current">
+                                <span id="current-model-name">Loading models...</span>
+                                <span class="dropdown-arrow">▼</span>
+                            </button>
+                            <div class="ai-model-options" id="ai-model-options">
+                                <div id="ai-model-list">
+                                    <!-- Will be populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                        <div id="ai-loading-indicator" class="ai-loading-indicator">
+                            <div class="ai-loading-spinner"></div>
+                        </div>
+                    </div>
+                    <div class="stats-bar">
+                        <div class="stat">
+                            <span class="stat-label">CPU</span>
+                            <span class="stat-value" id="cpu-stat">0%</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">MEM</span>
+                            <span class="stat-value" id="mem-stat">0%</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">CMDS</span>
+                            <span class="stat-value" id="cmd-stat">0</span>
+                        </div>
+                    </div>
+                    <button class="settings-btn" id="settings-btn">⚙️</button>
+                </div>
+            </div>
+            
+            <!-- Terminal Output Area -->
+            <div class="terminal-output" id="terminal-output">
+                <div class="welcome-animation" id="welcome">
+                    <pre class="ascii-art">
+ ███████╗████████╗██╗  ██╗██╗ ██████╗ █████╗ ██╗     
+ ██╔════╝╚══██╔══╝██║  ██║██║██╔════╝██╔══██╗██║     
+ █████╗     ██║   ███████║██║██║     ███████║██║     
+ ██╔══╝     ██║   ██╔══██║██║██║     ██╔══██║██║     
+ ███████╗   ██║   ██║  ██║██║╚██████╗██║  ██║███████╗
+ ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝
+                                                       
+        ██╗  ██╗ █████╗  ██████╗██╗  ██╗              
+        ██║  ██║██╔══██╗██╔════╝██║ ██╔╝              
+        ███████║███████║██║     █████╔╝               
+        ██╔══██║██╔══██║██║     ██╔═██╗               
+        ██║  ██║██║  ██║╚██████╗██║  ██╗              
+        ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝              
+                    </pre>
+                    <div class="typing-text">Initializing secure connection...</div>
+                </div>
+            </div>
+            
+            <!-- Input Area -->
+            <div class="terminal-input-container">
+                <div class="input-line">
+                    <span class="prompt" id="prompt">
+                        <span class="prompt-user">root</span>@<span class="prompt-host">ethicalhack</span>
+                        <span class="prompt-path">~</span>
+                        <span class="prompt-symbol">$</span>
+                    </span>
+                    <input type="text" class="terminal-input" id="terminal-input" 
+                           placeholder="Enter command..." 
+                           autocomplete="off" 
+                           spellcheck="false">
+                    <div class="input-glow"></div>
+                </div>
+                
+                <!-- Command Suggestions -->
+                <div class="suggestions" id="suggestions"></div>
+            </div>
+            
+            <!-- Side Panel for Scan Results -->
+            <div class="side-panel" id="side-panel">
+                <div class="panel-header">
+                    <h3>Scan Results</h3>
+                    <button class="close-panel" id="close-panel">×</button>
+                </div>
+                <div class="panel-content" id="panel-content"></div>
+            </div>
+        </div>
+        
+        <!-- Settings Modal -->
+        <div class="modal" id="settings-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Terminal Settings</h2>
+                    <button class="modal-close" id="close-settings">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-tabs">
+                        <button class="tab-btn active" data-tab="appearance">Appearance & Behavior</button>
+                        <button class="tab-btn" data-tab="ai">AI & Models</button>
+                        <button class="tab-btn" data-tab="permissions">Agent Permissions</button>
+                    </div>
+
+                    <div id="appearance" class="tab-content active">
+                        <div class="setting-group">
+                            <label>Theme</label>
+                            <select id="theme-select">
+                                <option value="matrix">Matrix Green</option>
+                                <option value="cyberpunk">Cyberpunk</option>
+                                <option value="dracula">Dracula</option>
+                                <option value="nord">Nord</option>
+                            </select>
+                        </div>
+                        <div class="setting-group">
+                            <label>Font Size</label>
+                            <input type="range" id="font-size" min="12" max="20" value="14">
+                        </div>
+                        <div class="setting-group">
+                            <label for="animations-toggle">Animations</label>
+                            <input type="checkbox" id="animations-toggle" data-setting="animations" checked>
+                        </div>
+                        <div class="setting-group">
+                            <label for="voice-input-toggle">Voice Input</label>
+                            <input type="checkbox" id="voice-input-toggle" data-setting="voiceInput" checked>
+                        </div>
+                    </div>
+
+                    <div id="ai" class="tab-content">
+                        <div class="setting-group">
+                            <label for="active-ai-toggle">Active AI</label>
+                            <input type="checkbox" id="active-ai-toggle" data-setting="activeAI" checked>
+                        </div>
+                        <div class="setting-group">
+                            <label for="model-picker-toggle">Show Model Picker in Prompt</label>
+                            <input type="checkbox" id="model-picker-toggle" data-setting="showModelPicker" checked>
+                        </div>
+                        <div class="setting-group">
+                            <label for="next-command-toggle">Next Command Suggestions</label>
+                            <input type="checkbox" id="next-command-toggle" data-setting="nextCommand" checked>
+                        </div>
+                        <div class="setting-group">
+                            <label for="prompt-suggestions-toggle">Inline Prompt Suggestions</label>
+                            <input type="checkbox" id="prompt-suggestions-toggle" data-setting="promptSuggestions" checked>
+                        </div>
+                    </div>
+
+                    <div id="permissions" class="tab-content">
+                        <div class="setting-group">
+                            <label>Apply Code Diffs</label>
+                            <select id="permission-apply-diffs" data-setting="permissionApplyDiffs">
+                                <option value="agent">Agent Decides</option>
+                                <option value="ask">Always Ask</option>
+                                <option value="allow">Always Allow</option>
+                            </select>
+                        </div>
+                        <div class="setting-group">
+                            <label>Execute Commands</label>
+                            <select id="permission-exec-cmd" data-setting="permissionExecCmd">
+                                <option value="agent">Agent Decides</option>
+                                <option value="ask">Always Ask</option>
+                                <option value="allow">Always Allow</option>
+                            </select>
+                        </div>
+                        <div class="setting-group">
+                            <label>Command Allowlist (Regex)</label>
+                            <input type="text" id="allowlist-input" data-setting="commandAllowlist" placeholder="e.g., ls -la, git status, ...">
+                        </div>
+                        <div class="setting-group">
+                            <label>Command Denylist (Regex)</label>
+                            <input type="text" id="denylist-input" data-setting="commandDenylist" placeholder="e.g., rm -rf .*, ...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/static/js/terminal.js"></script>
+    <script src="/static/js/commands.js"></script>
+    <script src="/static/js/animations.js"></script>
+</body>
+</html>
