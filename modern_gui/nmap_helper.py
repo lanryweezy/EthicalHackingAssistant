@@ -6,11 +6,13 @@ Based on the Cybersources Nmap Cheat Sheet
 
 import re
 from typing import List, Dict, Any, Optional
+import logging
 
 class NmapHelper:
     """Comprehensive Nmap command helper with cheat sheet integration"""
     
-    def __init__(self):
+    def __init__(self, logger):
+        self.logger = logger
         self.scan_types = {
             'discover_hosts': {
                 'name': 'Discover Live Hosts',
@@ -419,23 +421,214 @@ class NmapHelper:
             }
         }
     
+    def suggest_scan_command(self, target: str, scan_purpose: str = "general") -> Dict[str, Any]:
+        self.logger.info(f"Suggesting Nmap command for target: {target}, purpose: {scan_purpose}")
+        suggestions = []
+        
+        # Basic validation
+        if not target:
+            self.logger.warning("Target is required for Nmap command suggestion.")
+            return {"error": "Target is required"}
+        
+        # Determine scan type based on purpose
+        if scan_purpose.lower() in ["discovery", "recon", "reconnaissance"]:
+            suggestions.extend([
+                {
+                    'command': f'nmap -sn {target}',
+                    'description': 'Host discovery scan (ping sweep)',
+                    'purpose': 'Quick network reconnaissance'
+                },
+                {
+                    'command': f'nmap -sS -T4 --top-ports 1000 {target}',
+                    'description': 'Fast SYN scan of top 1000 ports',
+                    'purpose': 'Quick port discovery'
+                }
+            ])
+        
+        elif scan_purpose.lower() in ["web", "http", "website"]:
+            suggestions.extend([
+                {
+                    'command': f'nmap -sS -sV -p 80,443,8080,8443 {target}',
+                    'description': 'Scan common web ports with version detection',
+                    'purpose': 'Web service discovery'
+                },
+                {
+                    'command': f'nmap --script http-enum,http-headers,http-methods -p 80,443 {target}',
+                    'description': 'Web enumeration with NSE scripts',
+                    'purpose': 'Web application reconnaissance'
+                }
+            ])
+        
+        elif scan_purpose.lower() in ["vuln", "vulnerability", "security"]:
+            suggestions.extend([
+                {
+                    'command': f'nmap -sS -sV --script vuln {target}',
+                    'description': 'Vulnerability scan with service detection',
+                    'purpose': 'Security assessment'
+                },
+                {
+                    'command': f'nmap -A -T4 {target}',
+                    'description': 'Aggressive scan with OS detection and scripts',
+                    'purpose': 'Comprehensive security scan'
+                }
+            ])
+        
+        else:  # General purpose
+            suggestions.extend([
+                {
+                    'command': f'nmap -sS -sV -O {target}',
+                    'description': 'SYN scan with version and OS detection',
+                    'purpose': 'General reconnaissance'
+                },
+                {
+                    'command': f'nmap -A -T4 {target}',
+                    'description': 'Aggressive scan (OS, version, scripts, traceroute)',
+                    'purpose': 'Comprehensive information gathering'
+                },
+                {
+                    'command': f'nmap -p- -T4 {target}',
+                    'description': 'Scan all 65535 ports',
+                    'purpose': 'Complete port discovery'
+                }
+            ])
+        
+        self.logger.info(f"Generated {len(suggestions)} Nmap suggestions.")
+        return {
+            'target': target,
+            'purpose': scan_purpose,
+            'suggestions': suggestions,
+            'timing_info': 'Add timing template (e.g., -T4 for aggressive) for faster scans',
+            'output_info': 'Add output options: -oA filename for all formats'
+        }
+    
+    def get_scan_by_category(self, category: str) -> Dict[str, Any]:
+        self.logger.info(f"Getting Nmap scans by category: {category}")
+        if category not in self.scan_types:
+            self.logger.warning(f"Category '{category}' not found in Nmap scan types.")
+            return {"error": f"Category '{category}' not found. Available: {list(self.scan_types.keys())}"}
+        
+        return self.scan_types[category]
+    
+    def get_nse_scripts_by_service(self, service: str) -> List[str]:
+        self.logger.info(f"Getting NSE scripts for service: {service}")
+        service_lower = service.lower()
+        if service_lower in self.nse_scripts:
+            return self.nse_scripts[service_lower]
+        
+        # Search for partial matches
+        matches = []
+        for category, scripts in self.nse_scripts.items():
+            if service_lower in category or category in service_lower:
+                matches.extend(scripts)
+        
+        self.logger.info(f"Found {len(matches)} NSE scripts for service: {service}")
+        return matches
+    
+    def build_custom_command(self, target: str, **options) -> str:
+        self.logger.info(f"Building custom Nmap command for target: {target}, options: {options}")
+        cmd_parts = ['nmap']
+        
+        # Scan type
+        if options.get('syn_scan', True):
+            cmd_parts.append('-sS')
+        elif options.get('tcp_connect'):
+            cmd_parts.append('-sT')
+        elif options.get('udp_scan'):
+            cmd_parts.append('-sU')
+        
+        # Discovery options
+        if options.get('no_ping'):
+            cmd_parts.append('-Pn')
+        elif options.get('ping_only'):
+            cmd_parts.append('-sn')
+        
+        # Port options
+        if options.get('all_ports'):
+            cmd_parts.append('-p-')
+        elif options.get('top_ports'):
+            cmd_parts.append(f"--top-ports {options['top_ports']}")
+        elif options.get('ports'):
+            cmd_parts.append(f"-p {options['ports']}")
+        
+        # Detection options
+        if options.get('version_scan'):
+            cmd_parts.append('-sV')
+        if options.get('os_detection'):
+            cmd_parts.append('-O')
+        if options.get('aggressive'):
+            cmd_parts.append('-A')
+        
+        # Scripts
+        if options.get('default_scripts'):
+            cmd_parts.append('-sC')
+        elif options.get('script'):
+            cmd_parts.append(f"--script {options['script']}")
+        
+        # Timing
+        if options.get('timing'):
+            cmd_parts.append(f"-T{options['timing']}")
+        
+        # Output
+        if options.get('output_all'):
+            cmd_parts.append(f"-oA {options['output_all']}")
+        elif options.get('output_normal'):
+            cmd_parts.append(f"-oN {options['output_normal']}")
+        
+        # Target
+        cmd_parts.append(target)
+        
+        self.logger.info(f"Built custom Nmap command: {' '.join(cmd_parts)}")
+        return ' '.join(cmd_parts)
+    
+    def get_cheat_sheet(self) -> Dict[str, Any]:
+        self.logger.info("Getting Nmap cheat sheet.")
+        return {
+            'scan_types': self.scan_types,
+            'nse_scripts': self.nse_scripts,
+            'timing_templates': self.timing_templates,
+            'quick_reference': {
+                'basic_scans': [
+                    'nmap [target] - Basic scan',
+                    'nmap -sS [target] - SYN scan',
+                    'nmap -sU [target] - UDP scan',
+                    'nmap -A [target] - Aggressive scan'
+                ],
+                'discovery': [
+                    'nmap -sn [target] - Ping scan',
+                    'nmap -Pn [target] - No ping',
+                    'nmap -PS22-25,80 [target] - TCP SYN ping'
+                ],
+                'port_scanning': [
+                    'nmap -p- [target] - All ports',
+                    'nmap -p80,443 [target] - Specific ports',
+                    'nmap --top-ports 1000 [target] - Top ports'
+                ]
+            }
+        }
+    
     def validate_target(self, target: str) -> Dict[str, Any]:
-        """Validate if target format is acceptable for Nmap"""
+        self.logger.info(f"Validating Nmap target: {target}")
         valid_patterns = [
-            r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$',  # Single IP
-            r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/\d{1,2}$',  # CIDR
-            r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}-\d{1,3}$',  # IP range
-            r'^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$'  # Domain name
+            r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}
+,  # Single IP
+            r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/\d{1,2}
+,  # CIDR
+            r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}-\d{1,3}
+,  # IP range
+            r'^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}
+  # Domain name
         ]
         
         for pattern in valid_patterns:
             if re.match(pattern, target):
+                self.logger.info(f"Target '{target}' is valid.")
                 return {
                     'valid': True,
                     'format': pattern,
                     'target': target
                 }
         
+        self.logger.warning(f"Target '{target}' is invalid.")
         return {
             'valid': False,
             'error': 'Invalid target format. Use IP, CIDR, IP range, or domain name.',

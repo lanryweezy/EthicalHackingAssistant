@@ -1,10 +1,10 @@
-# WhiteHat Website
+# Ethical Hacking Assistant (WhiteHat)
 
-A complete website for WhiteHat, the ultimate pen test terminal for ethical hackers.
+A comprehensive ethical hacking terminal application with companion website. This project includes both the WhiteHat terminal application and its marketing website.
 
 ## Overview
 
-This website showcases WhiteHat, a terminal application designed specifically for ethical hackers and penetration testers. It features an intuitive UI with command blocks and segments, cross-platform compatibility, and advanced security tools.
+This repository contains the Ethical Hacking Assistant (codename WhiteHat), a terminal application designed specifically for ethical hackers and penetration testers. The project includes both the application itself and its marketing website. It features an intuitive UI with command blocks and segments, cross-platform compatibility, and advanced security tools.
 
 ## Features
 
@@ -47,52 +47,54 @@ This website showcases WhiteHat, a terminal application designed specifically fo
 ## File Structure
 
 ```
-WhiteHat-Website/
-├── index.html          # Homepage with overview, features, and pricing
-├── features.html       # Detailed feature descriptions
-├── pricing.html        # Pricing plans and comparison table
-├── download.html       # Download links and installation instructions
-├── support.html        # FAQ and contact form
-├── about.html          # Company information and team
-├── styles.css          # Comprehensive CSS styling
-├── landing-page.html   # Original comprehensive landing page
-└── README.md          # This documentation file
+EthicalHackingAssistant/
+├── index.html              # Website homepage with overview, features, and pricing
+├── features.html           # Website detailed feature descriptions
+├── pricing.html            # Website pricing plans and comparison table
+├── download.html           # Website download links and installation instructions
+├── support.html            # Website FAQ and contact form
+├── about.html              # Website company information and team
+├── landing-page.html       # Website comprehensive landing page
+├── styles.css              # Website CSS styling
+├── server.js               # Backend server with payment processing
+├── package.json            # Node.js dependencies
+├── Cargo.toml              # Rust project configuration
+├── requirements.txt        # Python dependencies
+├── build.py                # Python build script
+├── build_windows.bat       # Windows build script
+├── src/                    # Python application source code
+├── core/                   # Python core modules
+├── assets/                 # Application assets
+├── config/                 # Configuration files
+├── docs/                   # Documentation files
+├── examples/               # Example files
+├── modern_gui/             # GUI components
+└── README.md              # This documentation file
 ```
 
-## Pages
+## Components
 
-### 1. Home Page (index.html)
-- Hero section with main value proposition
-- Feature highlights
-- Pricing overview
-- Platform download links
+### Website Files
+Contains the marketing website for the Ethical Hacking Assistant:
+- **index.html**: Homepage with overview, features, and pricing
+- **features.html**: Detailed feature descriptions
+- **pricing.html**: Pricing plans and comparison table
+- **download.html**: Download links and installation instructions
+- **support.html**: FAQ and contact form
+- **about.html**: Company information and team
+- **landing-page.html**: Comprehensive landing page with all features
+- **styles.css**: Website styling
 
-### 2. Features Page (features.html)
-- Detailed feature descriptions
-- Command blocks and segments explanation
-- Security tools overview
-- Cross-platform compatibility details
+### Application Files
+Contains the Ethical Hacking Assistant terminal application:
+- **Python Application**: Located in src/ and core/ directories
+- **Rust Backend**: Defined in Cargo.toml
+- **Build Scripts**: build.py, build_windows.bat for packaging
+- **Configuration**: Various config files in the config/ directory
 
-### 3. Pricing Page (pricing.html)
-- Detailed pricing plans
-- Feature comparison table
-- Clear call-to-action buttons
-
-### 4. Download Page (download.html)
-- Platform-specific download links
-- Installation instructions with tabs
-- System requirements
-- Interactive JavaScript for tab switching
-
-### 5. Support Page (support.html)
-- Frequently Asked Questions
-- Contact form for support requests
-- Links to documentation and bug tracker
-
-### 6. About Page (about.html)
-- Company mission and values
-- Team member profiles
-- Technology and security focus
+### Backend Server
+- **server.js**: Node.js server with payment processing integration
+- **package.json**: JavaScript dependencies
 
 ## Design Elements
 
@@ -104,18 +106,36 @@ WhiteHat-Website/
 
 ## Technical Features
 
-- **Pure HTML/CSS/JavaScript**: No external dependencies
-- **Mobile-First Design**: Responsive across all screen sizes
-- **Cross-Browser Compatible**: Works on all modern browsers
-- **Performance Optimized**: Lightweight and fast loading
-- **Accessibility**: Semantic HTML and proper contrast ratios
+### Website
+- **Responsive Design**: Works across desktop, tablet, and mobile devices
+- **Modern UI**: Dark theme with green accents representing the ethical hacking community
+- **Interactive Elements**: Tab switching, hover effects, and smooth animations
+- **SEO Optimized**: Proper HTML structure with semantic markup
+- **Pure HTML/CSS/JavaScript**: No external dependencies for frontend
+
+### Application
+- **Cross-Platform**: Built with Python and Rust for cross-platform compatibility
+- **Terminal Interface**: Advanced terminal with command blocks and segmentation
+- **Security Tools**: Integrated ethical hacking tools and utilities
+- **Modern Architecture**: Clean code organization with modular components
 
 ## Usage
 
+### Website
 1. Open `index.html` in a web browser to view the homepage
 2. Navigate between pages using the header navigation
 3. All pages are interconnected with proper linking
 4. The website works offline once loaded
+
+### Backend Server
+1. Install dependencies: `npm install`
+2. Run the server: `npm start` or `node server.js`
+3. The server runs on port 3000 by default
+
+### Python Application
+1. Install dependencies: `pip install -r requirements.txt`
+2. Run the build script: `python build.py`
+3. The application executable will be created in the `dist/` directory after building
 
 ## Customization
 
@@ -133,13 +153,18 @@ WhiteHat-Website/
 
 ## Future Enhancements
 
+### Website
 - Add blog/news section
-- Implement actual download functionality
-- Add user authentication for pricing tiers
 - Include testimonials and case studies
 - Add live chat support
 - Implement analytics tracking
 
+### Application
+- Enhance terminal interface with more advanced features
+- Add more security tools integration
+- Implement session recording and analysis
+- Add reporting and export capabilities
+
 ## License
 
-This website template is created for WhiteHat application marketing purposes.
+This project is the Ethical Hacking Assistant (WhiteHat), a comprehensive tool for ethical hackers and penetration testers.

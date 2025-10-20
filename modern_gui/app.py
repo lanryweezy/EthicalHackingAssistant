@@ -30,7 +30,212 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import secrets
+from src.utils.file_utils import allowed_file, secure_filename
 from advanced_features.stream_manager import StreamManager
+from advanced_features.EnhancedReportGenerator import EnhancedReportGenerator
+from advanced_features.AutomationEngine import AutomationEngine
+import logging
+from src.core.ai_parser import AIParser
+
+from src.core.agent_registry import AgentRegistry
+from src.workflows.recon_workflow import ReconWorkflow
+from src.agents.recon_agent import ReconAgent
+from src.agents.exploit_agent import ExploitAgent
+from src.agents.cleanup_agent import CleanupAgent
+from src.agents.context_aware_agent import ContextAwareAgent
+from src.core.vulnerability_enrichment import VulnerabilityEnrichment
+
+
+class EthicalHackingAssistant:
+    """Main application class for the Ethical Hacking Assistant"""
+    
+    def __init__(self, platform_tools, logger):
+        """Initialize the main application components"""
+        # Initialize core components
+        self.ai_parser = AIParser(self.logger)
+        self.agent_registry = AgentRegistry(self.logger)
+        self.platform_tools = platform_tools
+        self.logger = logger
+
+        self.nmap_helper = NmapHelper(self.logger)
+        self.oscp_resources = OSCPResources(self.logger)
+        
+        # Set up logging (using app.py's logger)
+        
+        # Register agents
+        self.register_agents()
+        
+        # CLI-specific initialization removed for Flask backend
+        # Register command handlers (if needed for internal logic, otherwise remove)
+        # self.register_command_handlers()
+    
+    
+    
+    def register_agents(self):
+        """Register all available agents"""
+        self.agent_registry.register('recon', ReconAgent(self.platform_tools, self.logger))
+        self.agent_registry.register('exploit', ExploitAgent(self.platform_tools, self.logger))
+        self.agent_registry.register('cleanup', CleanupAgent(self.platform_tools, self.logger))
+        
+        # Initialize and register the context-aware agent
+        self.context_agent = ContextAwareAgent(self.logger)
+        self.agent_registry.register('context_aware', self.context_agent)
+        
+        # Log available agents
+        self.logger.info(f"Registered agents: {list(self.agent_registry.agents.keys())}")
+    
+    def register_command_handlers(self):
+        """Register handlers for CLI commands (not directly used in Flask backend)"""
+        pass
+
+    # CLI command handlers (removed as not directly used in Flask backend)
+    # def handle_agent_command(self, args):
+    #     return True
+    # def handle_workflow_command(self, args):
+    #     return True
+    # def handle_target_command(self, args):
+    #     return True
+    
+    def process_command(self, mode, command):
+        """Process a user command and update context-aware agent accordingly
+        
+        Args:
+            mode: The current CLI mode
+            command: The command text
+        Returns:
+            Result of command execution (plus learning and suggested next steps)
+        """
+        try:
+            if mode == 'agent':
+                # AI interprets and runs
+                task = self.ai_parser.parse(command)
+                agent = self.agent_registry.get(task['agent'])
+                if agent:
+                    if agent_name == "nmap_helper": # Handle nmap_helper commands
+                        # Example: nmap suggest <target> <purpose>
+                        parts = task['command'].split(maxsplit=1)
+                        if len(parts) > 1 and parts[0].lower() == "suggest":
+                            sub_command = parts[1].strip()
+                            sub_parts = sub_command.split(maxsplit=1)
+                            target = sub_parts[0] if sub_parts else ""
+                            purpose = sub_parts[1] if len(sub_parts) > 1 else "general"
+                            result = self.nmap_helper.suggest_scan_command(target, purpose)
+                        else:
+                            result = "Nmap Helper: Unknown command. Try 'nmap suggest <target> [purpose]'."
+                    elif agent_name == "oscp_resources": # Handle oscp_resources commands
+                        # Example: oscp methodology
+                        if task['command'].lower() == "methodology":
+                            result = self.oscp_resources.get_oscp_methodology()
+                        else:
+                            result = "OSCP Resources: Unknown command. Try 'oscp methodology'."
+                    else: # Existing agents
+                        result = agent.run(task)
+                    # Feed the input/output into context-aware agent for persistent learning
+                    if agent == self.context_agent and isinstance(result, dict) and 'data' in result:
+                        # Results are already context-updating
+                        pass
+                    elif agent != self.context_agent:
+                        # If another agent, try to pass output to context-agent if possible
+                        self.context_agent.update_context(command, str(result))
+                    # After every agent run, suggest next actions based on new context
+                    next_suggestions = self.context_agent.suggest_next_actions()
+                    if next_suggestions:
+                        result_str = result if isinstance(result, str) else ''
+                        result_str += "\n\n\033[92mAI Suggestions (Next Steps):\033[0m\n"
+                        for s in next_suggestions:
+                            result_str += f"- {s['action']}: {s['command']}\n  Reason: {s.get('description','')}\n"
+                        return result_str
+                    return result
+                else:
+                    return "Could not determine the appropriate agent."
+
+            elif mode == 'terminal':
+                # Raw shell command with safety checks
+                if self.is_safe_command(command):
+                    output, exit_code = self.platform_tools.execute_command(command)
+                    # Always push output to the context-aware agent
+                    self.context_agent.update_context(command, str(output))
+                    # Suggest next steps
+                    next_suggestions = self.context_agent.suggest_next_actions()
+                    output_str = str(output)
+                    if next_suggestions:
+                        output_str += "\n\n\033[92mAI Suggestions (Next Steps):\033[0m\n"
+                        for s in next_suggestions:
+                            output_str += f"- {s['action']}: {s['command']}\n  Reason: {s.get('description','')}\n"
+                    return output_str
+                else:
+                    return "Command rejected for security reasons. Use with caution."
+
+            elif mode == 'more':
+                # AI suggests, frontend confirms
+                task = self.ai_parser.parse(command)
+                self.cli.terminal.print_message(f"AI Suggestion: {task['command']}", "info")
+                confirm = self.cli.input_prompt("Run this command? (y/n): ", "warning")
+                if confirm.lower() == 'y':
+                    output = self.executor.run(task['command'])
+                    self.context_agent.update_context(command, str(output))
+                    next_suggestions = self.context_agent.suggest_next_actions()
+                    output_str = str(output)
+                    if next_suggestions:
+                        output_str += "\n\n\033[92mAI Suggestions (Next Steps):\033[0m\n"
+                        for s in next_suggestions:
+                            output_str += f"- {s['action']}: {s['command']}\n  Reason: {s.get('description','')}\n"
+                    return output_str
+                return "Command cancelled by user."
+
+            elif mode == 'auto':
+                # Fully autonomous workflow
+                if 'recon' in command.lower():
+                    workflow = ReconWorkflow(command, self.platform_tools, self.logger)
+                    result = workflow.run()
+                    self.context_agent.update_context(command, str(result))
+                    next_suggestions = self.context_agent.suggest_next_actions()
+                    result_str = str(result)
+                    if next_suggestions:
+                        result_str += "\n\n\033[92mAI Suggestions (Next Steps):\033[0m\n"
+                        for s in next_suggestions:
+                            result_str += f"- {s['action']}: {s['command']}\n  Reason: {s.get('description','')}\n"
+                    return result_str
+                else:
+                    return "Auto mode only supports recon workflow for now."
+            
+            return "Unknown mode. This should not happen."
+            
+        except Exception as e:
+            self.logger.error(f"Error processing command: {e}", exc_info=True)
+            return f"An error occurred: {e}"
+    
+    def is_safe_command(self, command):
+        """Check if a command is safe to execute
+        
+        Args:
+            command: The command string
+            
+        Returns:
+            True if the command is considered safe, False otherwise
+        """
+        # List of potentially dangerous commands/patterns
+        dangerous_patterns = [
+            "rm -rf", "format", "mkfs", "dd if=", "fdisk", 
+            ":(){ :|:& };:", # Fork bomb
+            "chmod -R 777 /", "chmod -R 000 /",
+            "wget .* | bash", "curl .* | bash",
+            "> /dev/sda", "> /dev/hda"
+        ]
+        
+        # Check for dangerous patterns
+        for pattern in dangerous_patterns:
+            if pattern in command.lower():
+                self.logger.warning(f"Potentially dangerous command detected: {command}")
+                return False
+        
+        return True
+    
+    def run(self):
+        """Run the main application"""
+        # Start the CLI interface with our command processor
+        self.cli.run(command_processor=self.process_command)
+
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -49,13 +254,28 @@ except ImportError:
     oscp_resources = None
     logger.warning("OSCP resources module not available")
 
+# New imports for NmapHelper and OSCPResources
+from nmap_helper import NmapHelper
+from oscp_resources import OSCPResources
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'ethical-hacking-secret-key'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+platform_tools: PlatformTools = PlatformTools(logger)
+ethical_hacking_assistant: EthicalHackingAssistant = EthicalHackingAssistant(platform_tools, logger)
+
+# Initialize managers for API routes
+scenario_manager: AutomationEngine = AutomationEngine(logger)
+tool_manager: EthicalHackingTools = EthicalHackingTools(platform_tools)
+report_generator: EnhancedReportGenerator = EnhancedReportGenerator(logger, REPORT_FOLDER)
+vulnerability_enrichment: VulnerabilityEnrichment = VulnerabilityEnrichment(logger)
+collaboration_manager: CollaborationManager = CollaborationManager(logger)
+compliance_checker: SecurityComplianceChecker = SecurityComplianceChecker(logger)
+
 # Command processor queue
-command_queue = queue.Queue()
-output_queue = queue.Queue()
+command_queue: queue.Queue = queue.Queue()
+output_queue: queue.Queue = queue.Queue()
 
 # OpenRouter API configuration
 OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', 'YOUR_OPENROUTER_API_KEY')  # Set this via environment variable
@@ -66,83 +286,92 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 # Initialize database for collaboration and workflows
-def init_database():
-    conn = sqlite3.connect('ethical_hacking.db')
-    cursor = conn.cursor()
-    
-    # Users table for collaboration
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id TEXT PRIMARY KEY,
-            username TEXT UNIQUE,
-            email TEXT,
-            role TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    # Sessions table for collaboration
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS sessions (
-            id TEXT PRIMARY KEY,
-            name TEXT,
-            description TEXT,
-            created_by TEXT,
-            participants TEXT,
-            status TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    # Workflows table for automation
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS workflows (
-            id TEXT PRIMARY KEY,
-            name TEXT,
-            description TEXT,
-            script TEXT,
-            triggers TEXT,
-            created_by TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    # Reports table for detailed reporting
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS reports (
-            id TEXT PRIMARY KEY,
-            title TEXT,
-            content TEXT,
-            template TEXT,
-            format TEXT,
-            created_by TEXT,
-            session_id TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    # Vulnerabilities table for event triggers
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS vulnerabilities (
-            id TEXT PRIMARY KEY,
-            target TEXT,
-            vulnerability_type TEXT,
-            severity TEXT,
-            description TEXT,
-            status TEXT,
-            detected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    conn.commit()
-    conn.close()
+def init_database() -> None:
+    """Initializes the SQLite database for ethical hacking assistant data."""
+    conn = None
+    try:
+        conn = sqlite3.connect('ethical_hacking.db')
+        cursor = conn.cursor()
+        
+        # Users table for collaboration
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id TEXT PRIMARY KEY,
+                username TEXT UNIQUE,
+                email TEXT,
+                role TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Sessions table for collaboration
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS sessions (
+                id TEXT PRIMARY KEY,
+                name TEXT,
+                description TEXT,
+                created_by TEXT,
+                participants TEXT,
+                status TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Workflows table for automation
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS workflows (
+                id TEXT PRIMARY KEY,
+                name TEXT,
+                description TEXT,
+                script TEXT,
+                triggers TEXT,
+                created_by TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Reports table for detailed reporting
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS reports (
+                id TEXT PRIMARY KEY,
+                title TEXT,
+                content TEXT,
+                template TEXT,
+                format TEXT,
+                created_by TEXT,
+                session_id TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Vulnerabilities table for event triggers
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS vulnerabilities (
+                id TEXT PRIMARY KEY,
+                target TEXT,
+                vulnerability_type TEXT,
+                severity TEXT,
+                description TEXT,
+                status TEXT,
+                detected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        conn.commit()
+        logger.info("Database initialized successfully.")
+    except sqlite3.Error as e:
+        logger.error(f"Database initialization error: {e}", exc_info=True)
+    finally:
+        if conn:
+            conn.close()
 
 init_database()
 
 class PlatformTools:
     """Handle platform-specific operations and commands"""
     
-    def __init__(self):
+    def __init__(self, logger):
+        self.logger = logger
         self.platform = platform.system().lower()
         self.is_windows = self.platform == 'windows'
         self.is_linux = self.platform == 'linux'
@@ -202,6 +431,7 @@ class PlatformTools:
     
     def execute_command(self, cmd: str) -> Tuple[str, int]:
         """Execute a command and return its output and exit code"""
+        self.logger.info(f"Executing command: {cmd}")
         try:
             result = subprocess.run(
                 cmd, 
@@ -209,11 +439,20 @@ class PlatformTools:
                 capture_output=True, 
                 text=True,
                 encoding='utf-8',
-                errors='replace'
+                errors='replace',
+                check=True # Raise CalledProcessError for non-zero exit codes
             )
+            self.logger.info(f"Command executed successfully. Exit Code: {result.returncode}")
             return result.stdout + result.stderr, result.returncode
+        except subprocess.CalledProcessError as e:
+            self.logger.error(f"Command failed with exit code {e.returncode}: {e.cmd}", exc_info=True)
+            return e.stdout + e.stderr, e.returncode
+        except FileNotFoundError:
+            self.logger.error(f"Command not found: {cmd.split()[0]}")
+            return f"Error: Command not found: {cmd.split()[0]}", 1
         except Exception as e:
-            return f"Error executing command: {str(e)}", 1
+            self.logger.exception(f"Error executing command '{cmd}':")
+            return f"An unexpected error occurred: {str(e)}", 1
     
     def get_command(self, cmd_type: str, *args) -> Optional[str]:
         """Get a platform-specific command with arguments"""
@@ -304,16 +543,41 @@ AVAILABLE_AI_MODELS = [
 class EthicalHackingTools:
     """Comprehensive toolkit for ethical hacking operations"""
     
+    CUSTOM_TOOLS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config', 'custom_tools.json')
+
     def __init__(self, platform_tools):
         self.platform = platform_tools
         self.tools_db = self._initialize_tools_database()
         self.exploits_db = self._initialize_exploits_database()
         self.report_templates = self._initialize_report_templates()
+        self._load_custom_tools() # Load custom tools on initialization
+
+    def _save_custom_tools(self):
+        """Saves the current custom tools to a JSON file."""
+        try:
+            with open(self.CUSTOM_TOOLS_FILE, 'w') as f:
+                json.dump(self.tools_db, f, indent=4)
+            self.platform.logger.info(f"Custom tools saved to {self.CUSTOM_TOOLS_FILE}")
+        except Exception as e:
+            self.platform.logger.error(f"Error saving custom tools: {e}", exc_info=True)
+
+    def _load_custom_tools(self):
+        """Loads custom tools from a JSON file and merges them with the default tools."""
+        if os.path.exists(self.CUSTOM_TOOLS_FILE):
+            try:
+                with open(self.CUSTOM_TOOLS_FILE, 'r') as f:
+                    custom_data = json.load(f)
+                self.tools_db.update(custom_data) # Merge custom tools with default ones
+                self.platform.logger.info(f"Custom tools loaded from {self.CUSTOM_TOOLS_FILE}")
+            except Exception as e:
+                self.platform.logger.error(f"Error loading custom tools: {e}", exc_info=True)
+        else:
+            self.platform.logger.info(f"Custom tools file not found: {self.CUSTOM_TOOLS_FILE}. Creating default.")
+            self._save_custom_tools() # Create an empty file if it doesn't exist
         
     def _initialize_tools_database(self):
         """Initialize database of ethical hacking tools with their commands and availability"""
-        # Comprehensive tools database with platform-specific installation and execution commands
-        # Enhanced with GitHub community tools and modern ethical hacking frameworks
+        self.platform.logger.info("Initializing tools database.")
         tools_db = {
             # Reconnaissance
             'nmap': {
@@ -1683,6 +1947,7 @@ class EthicalHackingTools:
     
     def _initialize_exploits_database(self):
         """Initialize exploits database sources"""
+        self.platform.logger.info("Initializing exploits database.")
         return {
             'exploit-db': {
                 'url': 'https://www.exploit-db.com',
@@ -1712,6 +1977,7 @@ class EthicalHackingTools:
     
     def _initialize_report_templates(self):
         """Initialize pentesting report templates"""
+        self.platform.logger.info("Initializing report templates.")
         return {
             'standard': {
                 'name': 'Standard Penetration Test Report',
@@ -1754,33 +2020,42 @@ class EthicalHackingTools:
     
     def check_tool_availability(self, tool_name):
         """Check if a specific tool is available on the system"""
+        self.platform.logger.info(f"Checking availability for tool: {tool_name}")
         if tool_name not in self.tools_db:
+            self.platform.logger.warning(f"Tool {tool_name} not found in database.")
             return {'available': False, 'error': 'Tool not in database'}
             
         tool_info = self.tools_db[tool_name]
         check_cmd = tool_info.get('check_cmd')
         
         if not check_cmd:
+            self.platform.logger.warning(f"No check command defined for tool: {tool_name}")
             return {'available': False, 'error': 'No check command defined'}
         
         try:
             output, exit_code = self.platform.execute_command(check_cmd)
             if exit_code == 0:
+                self.platform.logger.info(f"Tool {tool_name} is available. Version: {output.strip()}")
                 return {'available': True, 'version': output.strip()}
             else:
+                self.platform.logger.info(f"Tool {tool_name} is NOT available. Check command failed. Exit code: {exit_code}")
                 return {'available': False, 'error': 'Tool check failed'}
         except Exception as e:
+            self.platform.logger.error(f"Error checking tool availability for {tool_name}: {e}", exc_info=True)
             return {'available': False, 'error': str(e)}
     
     def get_tool_examples(self, tool_name):
         """Get examples for using a specific tool"""
+        self.platform.logger.info(f"Getting examples for tool: {tool_name}")
         if tool_name not in self.tools_db:
+            self.platform.logger.warning(f"Tool {tool_name} not found in database for examples.")
             return []
         
         return self.tools_db[tool_name].get('examples', [])
     
     def get_tool_categories(self):
         """Get all tool categories with their tools"""
+        self.platform.logger.info("Getting all tool categories.")
         categories = {}
         
         for tool_name, tool_info in self.tools_db.items():
@@ -1793,11 +2068,14 @@ class EthicalHackingTools:
                 'description': tool_info.get('description', '')
             })
         
+        self.platform.logger.info(f"Found {len(categories)} tool categories.")
         return categories
     
     def get_installation_command(self, tool_name):
         """Get platform-specific installation command for a tool"""
+        self.platform.logger.info(f"Getting installation command for tool: {tool_name}")
         if tool_name not in self.tools_db:
+            self.platform.logger.warning(f"Tool {tool_name} not found in database for installation command.")
             return None
             
         tool_info = self.tools_db[tool_name]
@@ -1805,17 +2083,64 @@ class EthicalHackingTools:
         
         # Get the appropriate command for the current platform
         platform_key = 'windows' if self.platform.is_windows else ('darwin' if self.platform.is_macos else 'linux')
-        return install_commands.get(platform_key)
-    
+        command = install_commands.get(platform_key)
+        if command:
+            self.platform.logger.info(f"Found installation command for {tool_name} on {platform_key}: {command}")
+        else:
+            self.platform.logger.warning(f"No installation command found for {tool_name} on {platform_key}.")
+        return command
+
+    def add_custom_tool(self, tool_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Adds a custom tool definition to the tools database.
+        """
+        tool_name = tool_data.get('name')
+        if not tool_name:
+            return {'success': False, 'error': 'Tool name is required.'}
+        
+        if tool_name in self.tools_db:
+            return {'success': False, 'error': f'Tool {tool_name} already exists.'}
+
+        self.tools_db[tool_name] = tool_data
+        self._save_custom_tools() # Persist changes
+        return {'success': True, 'message': f'Tool {tool_name} added successfully.'}
+
+    def install_tool(self, tool_name: str) -> Dict[str, Any]:
+        """Installs a specified ethical hacking tool.
+        """
+        install_cmd = self.get_installation_command(tool_name)
+        if not install_cmd:
+            return {'success': False, 'error': f'No installation command found for {tool_name} on this platform.'}
+
+        self.platform.logger.info(f"Attempting to install {tool_name} with command: {install_cmd}")
+        output, exit_code = self.platform.execute_command(install_cmd)
+
+        if exit_code == 0:
+            return {'success': True, 'message': f'{tool_name} installed successfully.', 'output': output}
+        else:
+            return {'success': False, 'error': f'Failed to install {tool_name}. Exit code: {exit_code}. Output: {output}'}
+
+    def get_installed_tools(self) -> List[Dict[str, Any]]:
+        """Returns a list of tools currently installed on the system.
+        """
+        installed_tools = []
+        for tool_name in self.tools_db.keys():
+            check_result = self.check_tool_availability(tool_name)
+            if check_result['available']:
+                installed_tools.append({'name': tool_name, 'version': check_result.get('version', 'Unknown')})
+        return installed_tools
+
     def search_exploits(self, query, source='exploit-db'):
         """Search for exploits in specified database"""
+        self.platform.logger.info(f"Searching exploits for query: '{query}' in source: {source}")
         if source not in self.exploits_db:
+            self.platform.logger.warning(f"Unknown exploit database source: {source}")
             return {'error': 'Unknown exploit database source'}
             
         db_info = self.exploits_db[source]
         search_url = f"{db_info['search_url']}{query}"
         
         # For now, return the search URL - in a real implementation, we'd parse results
+        self.platform.logger.info(f"Returning search URL for exploits: {search_url}")
         return {
             'query': query,
             'source': source,
@@ -1826,19 +2151,22 @@ class EthicalHackingTools:
     
     def generate_report_template(self, template_name='standard'):
         """Generate a penetration test report template"""
+        self.platform.logger.info(f"Generating report template: {template_name}")
         if template_name not in self.report_templates:
+            self.platform.logger.warning(f"Report template '{template_name}' not found.")
             return {'error': 'Unknown report template'}
             
         template = self.report_templates[template_name]
         
         # Generate a simple template structure - in reality, we'd create actual documents
+        self.platform.logger.info(f"Report template {template_name} generated.")
         return {
             'name': template['name'],
             'sections': template['sections'],
             'available_formats': template['format']
         }
 
-platform_tools = PlatformTools()
+platform_tools = PlatformTools(logger)
 # Initialize the StreamManager
 stream_manager = StreamManager(socketio)
 
@@ -1850,98 +2178,147 @@ os.makedirs(REPORT_FOLDER, exist_ok=True)
 
 # Scenarios API Routes
 @app.route('/api/scenarios', methods=['GET'])
-def get_scenarios():
+def get_scenarios() -> Response:
+    """API endpoint to retrieve all available scenarios."""
     try:
         scenarios = scenario_manager.get_all_scenarios()
+        logger.info("Fetched all scenarios.")
         return jsonify(scenarios)
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        logger.exception("Error fetching scenarios:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
 
 @app.route('/api/scenarios/custom', methods=['POST'])
-def create_custom_scenario():
+def create_custom_scenario() -> Response:
+    """API endpoint to create a custom scenario (workflow)."""
     try:
         data = request.get_json()
-        result = scenario_manager.add_custom_scenario(data)
+        result = scenario_manager.create_workflow(data['name'], data['description'], data['steps'], data['triggers'], data['created_by'])
+        logger.info(f"Created custom scenario: {data.get('name')}")
         return jsonify(result)
+    except KeyError as ke:
+        logger.error(f"API Error: Missing data for custom scenario creation: {ke}")
+        return jsonify({'error': f'Missing data for custom scenario creation: {ke}'}), 400
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        logger.exception("Error creating custom scenario:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
 
 # Tools API Routes
 @app.route('/api/tools/check/<tool_name>', methods=['GET'])
-def check_tool(tool_name):
+def check_tool(tool_name: str) -> Response:
+    """API endpoint to check the installation status of a tool."""
     try:
-        result = tool_manager.check_tool_installation(tool_name)
+        result = tool_manager.check_tool_availability(tool_name)
+        logger.info(f"Checked tool availability for {tool_name}. Result: {result.get('available')}")
         return jsonify(result)
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        logger.exception(f"Error checking tool availability for {tool_name}:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
 
 @app.route('/api/tools/install/<tool_name>', methods=['POST'])
-def install_tool(tool_name):
+def install_tool(tool_name: str) -> Response:
+    """API endpoint to install a specified tool."""
     try:
         result = tool_manager.install_tool(tool_name)
+        logger.info(f"Attempted to install tool {tool_name}. Success: {result.get('success')}")
         return jsonify(result)
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        logger.exception(f"Error installing tool {tool_name}:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
 
 @app.route('/api/tools/installed', methods=['GET'])
-def get_installed_tools():
+def get_installed_tools() -> Response:
+    """API endpoint to retrieve a list of installed tools."""
     try:
         tools = tool_manager.get_installed_tools()
+        logger.info("Fetched list of installed tools.")
         return jsonify(tools)
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        logger.exception("Error fetching installed tools:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
 
 @app.route('/api/tools/categories', methods=['GET'])
-def get_tool_categories():
+def get_tool_categories() -> Response:
+    """API endpoint to retrieve all tool categories."""
     try:
         categories = tool_manager.get_tool_categories()
+        logger.info("Fetched tool categories.")
         return jsonify(categories)
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        logger.exception("Error fetching tool categories:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
 
 @app.route('/api/tools/custom', methods=['POST'])
-def add_custom_tool():
+def add_custom_tool() -> Response:
+    """API endpoint to add a custom tool definition."""
     try:
         data = request.get_json()
         result = tool_manager.add_custom_tool(data)
+        logger.info(f"Added custom tool: {data.get('name')}. Success: {result.get('success')}")
         return jsonify(result)
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        logger.exception("Error adding custom tool:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
 
 # Report API Routes
 @app.route('/api/reports/templates', methods=['GET'])
-def get_report_templates():
+def get_report_templates() -> Response:
+    """API endpoint to retrieve available report templates."""
     try:
         templates = report_generator.get_templates()
+        logger.info("Fetched report templates.")
         return jsonify(templates)
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        logger.exception("Error fetching report templates:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
 
 @app.route('/api/reports/generate', methods=['POST'])
-def generate_report():
+def generate_report() -> Response:
+    """API endpoint to generate a new report."""
     try:
         data = request.get_json()
-        result = report_generator.create_report(data)
+        result = report_generator.generate_report(data['template_name'], data['data'], data.get('format', 'html'))
+        logger.info(f"Generated report for template {data.get('template_name')}. Result: {result.get('report_id')}")
         return jsonify(result)
+    except KeyError as ke:
+        logger.error(f"API Error: Missing data for report generation: {ke}")
+        return jsonify({'error': f'Missing data for report generation: {ke}'}), 400
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        logger.exception("Error generating report:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
 
 @app.route('/api/reports/download/<report_id>', methods=['GET'])
-def download_report(report_id):
+def download_report(report_id: str) -> Response:
+    """API endpoint to download a generated report."""
     try:
-        report_path = report_generator.get_report_path(report_id)
+        export_format = request.args.get('format', 'html') # Get format from query param
+        result = report_generator.export_report(report_id, export_format)
+        if result.get('error'):
+            return jsonify({'error': result['error']}), 404
+
+        report_path = result['path']
+        filename = result['filename']
+
+        logger.info(f"Attempting to download report {report_id} from {report_path}")
         return send_from_directory(
             os.path.dirname(report_path),
             os.path.basename(report_path),
-            as_attachment=True
+            as_attachment=True,
+            download_name=filename # Use download_name for correct filename in browser
         )
+    except FileNotFoundError:
+        logger.error(f"Report file not found for report_id: {report_id}")
+        return jsonify({'error': 'Report not found'}), 404
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        logger.exception(f"Error downloading report {report_id}:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
 
 @app.route('/api/reports/upload-evidence', methods=['POST'])
-def upload_evidence():
+def upload_evidence() -> Response:
+    """API endpoint to upload evidence files."""
     try:
         if 'files' not in request.files:
+            logger.error("API Error: No files provided for evidence upload.")
             return jsonify({'error': 'No files provided'}), 400
 
         files = request.files.getlist('files')
@@ -1953,37 +2330,50 @@ def upload_evidence():
                 evidence_path = os.path.join(UPLOAD_FOLDER, filename)
                 file.save(evidence_path)
                 paths.append(evidence_path)
+                logger.info(f"Uploaded evidence file: {filename}")
+            else:
+                logger.warning(f"Attempted to upload disallowed file type: {file.filename}")
+                return jsonify({'error': f'File type not allowed: {file.filename}'}), 400
 
         return jsonify({'paths': paths})
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        logger.exception("Error uploading evidence:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
 
 # Vulnerability API Routes
 @app.route('/api/vulnerability/cve/<cve_id>', methods=['GET'])
-def get_cve_details(cve_id):
+def get_cve_details(cve_id: str) -> Response:
+    """API endpoint to retrieve details for a specific CVE."""
     try:
         details = vulnerability_enrichment.get_cve_details(cve_id)
+        logger.info(f"Fetched CVE details for {cve_id}.")
         return jsonify(details)
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        logger.exception(f"Error fetching CVE details for {cve_id}:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
 
 @app.route('/api/vulnerability/exploits/<cve_id>', methods=['GET'])
-def get_exploits(cve_id):
+def get_exploits(cve_id: str) -> Response:
+    """API endpoint to search for exploits related to a CVE."""
     try:
         exploits = vulnerability_enrichment.search__exploits(cve_id)
+        logger.info(f"Searched exploits for {cve_id}.")
         return jsonify(exploits)
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        logger.exception(f"Error searching exploits for {cve_id}:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
 
 # Execute command/step API
 @app.route('/api/execute_step', methods=['POST'])
-def execute_step():
+def execute_step() -> Response:
+    """API endpoint to execute a single command or step."""
     try:
         data = request.get_json()
         command = data.get('command')
         target = data.get('target')
 
         if not command:
+            logger.error("API Error: No command provided in /api/execute_step request.")
             return jsonify({'error': 'No command provided'}), 400
 
         # Replace placeholders in command
@@ -1992,14 +2382,123 @@ def execute_step():
         # Execute command and get output
         output, exit_code = platform_tools.execute_command(command)
 
+        logger.info(f"Executed step command '{command}'. Exit Code: {exit_code}")
         return jsonify({
             'output': output,
             'exit_code': exit_code,
             'success': exit_code == 0
         })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        logger.exception(f"Error executing step command '{command}':")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
+
+@app.route('/api/process_command', methods=['POST'])
+def process_command_api() -> Response:
+    """API endpoint to process commands using the Ethical Hacking Assistant core logic."""
+    try:
+        data = request.get_json()
+        mode = data.get('mode')
+        command = data.get('command')
+
+        if not mode or not command:
+            logger.error("API Error: Mode or command missing in /api/process_command request.")
+            return jsonify({'error': 'Mode and command are required'}), 400
+
+        result = ethical_hacking_assistant.process_command(mode, command)
+        logger.info(f"Processed command '{command}' in mode '{mode}'. Result: {result[:100]}...") # Log first 100 chars
+        return jsonify({'result': result})
+    except Exception as e:
+        logger.exception(f"Error processing command '{command}' in mode '{mode}':") # Log full traceback
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
+
+# Nmap Helper API Routes
+@app.route('/api/nmap/suggest_command', methods=['POST'])
+def nmap_suggest_command() -> Response:
+    """API endpoint to get Nmap command suggestions based on target and purpose."""
+    try:
+        data = request.get_json()
+        target = data.get('target')
+        purpose = data.get('purpose', 'general')
+        if not target:
+            return jsonify({'error': 'Target is required'}), 400
+        suggestions = ethical_hacking_assistant.nmap_helper.suggest_scan_command(target, purpose)
+        return jsonify(suggestions)
+    except Exception as e:
+        logger.exception("Error suggesting Nmap command:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
+
+@app.route('/api/nmap/cheat_sheet', methods=['GET'])
+def nmap_cheat_sheet() -> Response:
+    """API endpoint to retrieve the complete Nmap cheat sheet."""
+    try:
+        cheat_sheet = ethical_hacking_assistant.nmap_helper.get_cheat_sheet()
+        return jsonify(cheat_sheet)
+    except Exception as e:
+        logger.exception("Error getting Nmap cheat sheet:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
+
+# OSCP Resources API Routes
+@app.route('/api/oscp/methodology', methods=['GET'])
+def oscp_methodology() -> Response:
+    """API endpoint to retrieve the OSCP methodology framework."""
+    try:
+        methodology = ethical_hacking_assistant.oscp_resources.get_oscp_methodology()
+        return jsonify(methodology)
+    except Exception as e:
+        logger.exception("Error getting OSCP methodology:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
+
+@app.route('/api/oscp/buffer_overflow_guide', methods=['GET'])
+def oscp_buffer_overflow_guide() -> Response:
+    """API endpoint to retrieve the OSCP buffer overflow guide."""
+    try:
+        guide = ethical_hacking_assistant.oscp_resources.get_buffer_overflow_guide()
+        return jsonify(guide)
+    except Exception as e:
+        logger.exception("Error getting buffer overflow guide:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
+
+@app.route('/api/oscp/privilege_escalation_checks', methods=['GET'])
+def oscp_privilege_escalation_checks() -> Response:
+    """API endpoint to retrieve privilege escalation checks for a given OS."""
+    try:
+        checks = ethical_hacking_assistant.oscp_resources.get_privilege_escalation_checks()
+        return jsonify(checks)
+    except Exception as e:
+        logger.exception("Error getting privilege escalation checks:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
+
+@app.route('/api/oscp/active_directory_attacks', methods=['GET'])
+def oscp_active_directory_attacks() -> Response:
+    """API endpoint to retrieve Active Directory attack methodologies."""
+    try:
+        attacks = ethical_hacking_assistant.oscp_resources.get_active_directory_attacks()
+        return jsonify(attacks)
+    except Exception as e:
+        logger.exception("Error getting Active Directory attacks:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
+
+@app.route('/api/oscp/practice_boxes', methods=['GET'])
+def oscp_practice_boxes() -> Response:
+    """API endpoint to retrieve recommended OSCP practice boxes."""
+    try:
+        boxes = ethical_hacking_assistant.oscp_resources.get_oscp_practice_boxes()
+        return jsonify(boxes)
+    except Exception as e:
+        logger.exception("Error getting OSCP practice boxes:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
+
+@app.route('/api/oscp/study_plan', methods=['GET'])
+def oscp_study_plan() -> Response:
+    """API endpoint to generate a structured OSCP study plan."""
+    try:
+        study_plan = ethical_hacking_assistant.oscp_resources.generate_study_plan()
+        return jsonify(study_plan)
+    except Exception as e:
+        logger.exception("Error generating OSCP study plan:")
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
 
 # Main entry point
 if __name__ == '__main__':
+    """Runs the Flask application with SocketIO support."""
     socketio.run(app, debug=True)

@@ -11,11 +11,13 @@ from typing import Dict, List, Any, Optional
 import subprocess
 import platform
 from pathlib import Path
+import logging
 
 class OSCPResources:
     """OSCP-specific resources, methodologies, and automation"""
     
-    def __init__(self):
+    def __init__(self, logger):
+        self.logger = logger
         self.platform = platform.system().lower()
         self.is_windows = self.platform == 'windows'
         self.is_linux = self.platform == 'linux'
@@ -315,7 +317,7 @@ badchars = (
         }
     
     def get_oscp_methodology(self) -> Dict[str, Any]:
-        """Get the complete OSCP methodology framework"""
+        self.logger.info("Getting OSCP methodology.")
         return {
             "phases": self.methodology_phases,
             "current_phase": 1,
@@ -324,6 +326,7 @@ badchars = (
     
     def _generate_methodology_checklist(self) -> Dict[int, List[str]]:
         """Generate detailed checklist for each methodology phase"""
+        self.logger.debug("Generating OSCP methodology checklist.")
         return {
             1: [  # Information Gathering
                 "□ Identify target IP range",
@@ -389,6 +392,7 @@ badchars = (
         }
     
     def get_buffer_overflow_guide(self, step: Optional[str] = None) -> Dict[str, Any]:
+        self.logger.info(f"Getting buffer overflow guide for step: {step}")
         """Get buffer overflow methodology and templates"""
         if step:
             return {
@@ -399,15 +403,17 @@ badchars = (
         return self.buffer_overflow
     
     def get_privilege_escalation_checks(self, os_type: str = "linux") -> Dict[str, Any]:
+        self.logger.info(f"Getting privilege escalation checks for OS: {os_type}")
         """Get privilege escalation enumeration for specified OS"""
         return self.privesc.get(os_type, self.privesc["linux"])
     
     def get_active_directory_attacks(self) -> Dict[str, Any]:
+        self.logger.info("Getting Active Directory attack methodologies.")
         """Get Active Directory attack methodologies"""
         return self.ad_attacks
     
     def generate_oscp_report_template(self, target_info: Dict[str, Any]) -> str:
-        """Generate OSCP-style penetration test report template"""
+        self.logger.info(f"Generating OSCP report template for target: {target_info.get('target')}")
         template = f"""
 # Penetration Test Report
 
@@ -513,6 +519,7 @@ The testing methodology followed the OSCP guidelines:
         return boxes
     
     def generate_study_plan(self, weeks: int = 12) -> Dict[str, Any]:
+        self.logger.info(f"Generating OSCP study plan for {weeks} weeks.")
         """Generate a structured OSCP study plan"""
         if weeks < 4:
             weeks = 4
@@ -603,4 +610,5 @@ The testing methodology followed the OSCP guidelines:
             }
         }
         
+        self.logger.info(f"Generated OSCP study plan for {weeks} weeks.")
         return study_plan

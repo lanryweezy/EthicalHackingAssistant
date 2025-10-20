@@ -1,0 +1,11 @@
+node_modules/
+build/
+dist/
+*.pyc
+__pycache__/
+.env
+*.log
+*.db
+*.spec
+package-lock.json
+yarn.lock
