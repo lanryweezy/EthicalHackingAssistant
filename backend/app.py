@@ -4,46 +4,23 @@ Modern Ethical Hacking Terminal - Flask backend
 A futuristic terminal application for pentesters with OpenRouter AI integration
 """
 
-from flask import Flask, render_template, jsonify, request, send_from_directory
-from flask_socketio import SocketIO, emit
-import os
-import sys
-import json
+from flask import Flask, render_template, jsonify, request
+from flask_socketio import SocketIO
 import subprocess
 import platform
-import psutil
-import time
-from datetime import datetime
-import threading
-import queue
-import requests
-import shutil
-import re
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
-import uuid
-import sqlite3
 import logging
-import yaml
-from jinja2 import Template
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
-import hashlib
-import secrets
+from typing import Optional, Tuple
 
 # Corrected imports for the new structure
 from nmap_helper import NmapHelper
 from oscp_resources import OSCPResources
 from advanced_features.stream_manager import StreamManager
-from src.core.ai_parser import AIParser
-from src.core.agent_registry import AgentRegistry
-from src.workflows.recon_workflow import ReconWorkflow
-from src.agents.recon_agent import ReconAgent
-from src.agents.exploit_agent import ExploitAgent
-from src.agents.cleanup_agent import CleanupAgent
-from src.agents.context_aware_agent import ContextAwareAgent
-from src.core.vulnerability_enrichment import VulnerabilityEnrichment
-from src.utils.file_utils import allowed_file, secure_filename
+from core.ai_parser import AIParser
+from core.agent_registry import AgentRegistry
+from agents.recon_agent import ReconAgent
+from agents.exploit_agent import ExploitAgent
+from agents.cleanup_agent import CleanupAgent
+from agents.context_aware_agent import ContextAwareAgent
 
 app = Flask(__name__,
             static_folder='../frontend/static',
@@ -55,6 +32,32 @@ def index():
 
 app.config['SECRET_KEY'] = 'ethical-hacking-secret-key'
 socketio = SocketIO(app, cors_allowed_origins="*")
+
+@app.route('/api/agents', methods=['GET'])
+def get_agents():
+    """Returns a list of available agents"""
+    return jsonify(list(ethical_hacking_assistant.agent_registry.agents.keys()))
+
+@app.route('/api/execute', methods=['POST'])
+def execute_task():
+    """Executes a task with the specified agent"""
+    data = request.json
+    agent_name = data.get('agent')
+    task = data.get('task')
+
+    if not agent_name or not task:
+        return jsonify({'error': 'Agent and task are required'}), 400
+
+    agent = ethical_hacking_assistant.agent_registry.get_agent(agent_name)
+    if not agent:
+        return jsonify({'error': f'Agent "{agent_name}" not found'}), 404
+
+    try:
+        result = agent.execute_task(task)
+        return jsonify({'result': result})
+    except Exception as e:
+        logger.exception(f"Error executing task with agent '{agent_name}':")
+        return jsonify({'error': str(e)}), 500
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

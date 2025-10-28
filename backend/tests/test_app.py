@@ -1,6 +1,6 @@
 import unittest
 from flask_testing import TestCase
-from backend.app import app, ethical_hacking_assistant
+from app import app, ethical_hacking_assistant
 
 class AppTest(TestCase):
     def create_app(self):

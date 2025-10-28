@@ -13,6 +13,7 @@ class EthicalHackingTerminal {
 
         this.initializeElements();
         this.loadSettings();
+        this.loadAiModelPreference();
         this.initializeSocketConnection();
         this.initializeEventListeners();
         this.startStatsUpdate();
@@ -47,6 +48,7 @@ class EthicalHackingTerminal {
         this.settingsModal = document.getElementById('settings-modal');
         this.settingsBtn = document.getElementById('settings-btn');
         this.closeSettings = document.getElementById('close-settings');
+        this.themeSelect = document.getElementById('theme-select');
         this.activeAiToggle = document.getElementById('active-ai-toggle');
         this.nextCommandToggle = document.getElementById('next-command-toggle');
         
@@ -702,10 +704,10 @@ class EthicalHackingTerminal {
         responseBlock.className = 'output-block ai-response';
         responseBlock.innerHTML = `
             ${data.content}
-            div class="feedback-buttons"
-                button class="feedback-btn" data-feedback="useful"Useful/button
-                button class="feedback-btn" data-feedback="not-useful"Not Useful/button
-            /div
+            <div class="feedback-buttons">
+                <button class="feedback-btn" data-feedback="useful">Useful</button>
+                <button class="feedback-btn" data-feedback="not-useful">Not Useful</button>
+            </div>
         `;
         this.terminalOutput.appendChild(responseBlock);
         this.scrollToBottom();

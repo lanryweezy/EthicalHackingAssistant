@@ -129,8 +129,12 @@ function startPythonBackend() {
     const pythonPath = process.platform === 'win32' ? 'python' : 'python3';
     
     // Start the Flask server
-    pythonProcess = spawn(path.join(__dirname, '../../backend/venv/bin/python3'), [path.join(__dirname, '../../backend/app.py')], {
-        cwd: path.join(__dirname, '../../backend'),
+    const pythonExecutable = process.platform === 'win32' ? 'python.exe' : 'python3';
+    const venvPath = process.platform === 'win32' ? 'Scripts' : 'bin';
+    const pythonPath = path.join(__dirname, '..', '..', 'backend', 'venv', venvPath, pythonExecutable);
+
+    pythonProcess = spawn(pythonPath, [path.join(__dirname, '..', '..', 'backend', 'app.py')], {
+        cwd: path.join(__dirname, '..', '..', 'backend'),
         env: { ...process.env, FLASK_ENV: 'production' }
     });
 
